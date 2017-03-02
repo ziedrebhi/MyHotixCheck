@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.ClientsActivity">
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_send_white_24dp"
+        android:title="@string/two"
+        app:showAsAction="ifRoom" />
+
+    <!-- Settings, should always be in the overflow -->
+    <item
+        android:id="@+id/action_settings"
+
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/help"
+        android:title="@string/help"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/version"
+        android:title="@string/version"
+        app:showAsAction="never" />
+
+</menu>

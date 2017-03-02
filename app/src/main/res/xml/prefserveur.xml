@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/serveur">
+        <EditTextPreference
+            android:defaultValue="41.228.14.111"
+            android:key="SERVEUR"
+            android:summary="41.228.14.111"
+            android:title="IP serveur"></EditTextPreference>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="AUTOUPDATE"
+            android:summary="@string/non"
+            android:title="@string/autoupdate"></hotix.myhotix.checkin.utilities.Pref>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/hotel">
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="HOTEL"
+            android:summary="@string/code_hotel"
+            android:title="@string/code_hotel"></EditTextPreference>
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/affichage">
+
+
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="BIRTH"
+            android:summary="@string/show_date_naissance"
+            android:title="@string/show_date_naissance"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="FUMEUR"
+            android:summary="@string/show_fumeur"
+            android:title="@string/show_fumeur"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="HANDICAP"
+            android:summary="@string/show_handicap"
+            android:title="@string/show_handicap"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="DOCIDEN"
+            android:summary="@string/str_doc_type"
+            android:title="@string/str_doc_type"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="GENDER"
+            android:summary="@string/str_sexe"
+            android:title="@string/str_sexe"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="SITFAM"
+            android:summary="@string/str_sit_fam"
+            android:title="@string/str_sit_fam"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="NOM"
+            android:summary="@string/str_nom"
+            android:title="@string/str_nom"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="PRENOM"
+            android:summary="@string/str_prenom"
+            android:title="@string/str_prenom"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="EMAIL"
+            android:summary="@string/str_email"
+            android:title="@string/str_email"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="GSM"
+            android:summary="@string/str_gsm"
+            android:title="@string/str_gsm"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="PAYS"
+            android:summary="@string/str_pays"
+            android:title="@string/str_pays"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="ADDRESS"
+            android:summary="@string/str_adresse"
+            android:title="@string/str_adresse"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="CODEPOSTAL"
+            android:summary="@string/str_code_postal"
+            android:title="@string/str_code_postal"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="CITY"
+            android:summary="@string/str_city"
+            android:title="@string/str_city"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="PROFESSION"
+            android:summary="@string/str_profession"
+            android:title="@string/str_profession"></hotix.myhotix.checkin.utilities.Pref>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/mode_update">
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="PAX"
+            android:summary="@string/update_pax"
+            android:title="@string/update_pax"></hotix.myhotix.checkin.utilities.Pref>
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/options">
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="true"
+            android:key="ANIMATION"
+            android:summary="@string/animation"
+            android:title="@string/animation"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="false"
+            android:key="SHOWCLIENTS"
+            android:summary="@string/showcli"
+            android:title="@string/showcli"></hotix.myhotix.checkin.utilities.Pref>
+        <hotix.myhotix.checkin.utilities.Pref
+            android:defaultValue="false"
+            android:key="SIGNATURE"
+            android:summary="@string/SIGNATURE"
+            android:title="@string/SIGNATURE"></hotix.myhotix.checkin.utilities.Pref>
+    </PreferenceCategory>
+</PreferenceScreen>

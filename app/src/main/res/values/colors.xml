@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#146dae</color>
+    <!--<color name="colorPrimary">#146dae</color>-->
+    <!--<color name="colorPrimaryDark">#162661</color>-->
+    <color name="colorPrimaryDark">#125688</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#c8e8ff</color>
+    <color name="toolbarTransparent">#00FFFFFF</color>
+    <color name="actionbar_opacity">#33000000</color>
+    <color name="white">#ffffff</color>
+    <color name="red">#f40202</color>
+    <color name="green">#078e26</color>
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <color name="view_divider_color">#BABABA</color>
+    <color name="view_divider_color_2">#DADADA</color>
+
+</resources>

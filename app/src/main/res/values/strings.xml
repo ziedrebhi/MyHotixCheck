@@ -1,0 +1,154 @@
+<resources>
+    <string name="app_name">MyHotixCheck</string>
+
+    <string name="action_settings">Paramètres</string>
+    <string name="speech_prompt">Resa ref </string>
+
+    <string name="speech_not_supported" translatable="false">speech_not_supported</string>
+    <string name="one" translatable="false">ONE</string>
+    <string name="eight" translatable="false">EIGHT</string>
+    <string name="five" translatable="false">FIVE</string>
+    <string name="four" translatable="false">FOUR</string>
+    <string name="nine" translatable="false">NINE</string>
+    <string name="seven" translatable="false">SEVEN</string>
+    <string name="six" translatable="false">SIX</string>
+    <string name="ten" translatable="false">TEN</string>
+    <string name="three" translatable="false">THREE</string>
+    <string name="two" translatable="false">TWO</string>
+    <string name="title_activity_scrollable_tabs" translatable="false">Scrollable Tabs</string>
+    <string name="title_activity_simple_tabs" translatable="false">Simple Tabs</string>
+    <string name="btn_simple_tabs" translatable="false">Simple Tabs</string>
+    <string name="btn_scrollable_tabs" translatable="false">Scrollable Tabs</string>
+    <string name="btn_icon_text_tabs" translatable="false">Icon &amp; Text Tabs</string>
+    <string name="btn_icon_tabs" translatable="false">Only Icon Tabs</string>
+    <string name="btn_pinned_top_tabs" translatable="false">Pinned To Top Tabs</string>
+    <string name="title_activity_icon_text_tabs" translatable="false">Icon and Text Tabs</string>
+    <string name="title_activity_icon_tabs" translatable="false">Icon Tabs</string>
+    <string name="btn_custom_icon_tabs" translatable="false">Custom View Icon &amp; Text</string>
+    <string name="title_activity_custom_view_icon_text_tabs" translatable="false">Custom View Icon &amp; Text</string>
+    <string name="title_activity_pinned_top_tabs" translatable="false">Pin Top Tabs</string>
+    <string name="title_activity_main2" translatable="false">Main2Activity</string>
+
+    <string name="hello_world" translatable="false">Hello world!</string>
+
+    <!-- Chaines des vues -->
+    <string name="str_resa_ref">Réf. Réservation</string>
+    <string name="str_nom">Nom</string>
+    <string name="str_prenom">Prénom</string>
+    <string name="str_pays">Pays</string>
+    <string name="str_adresse">Adresse</string>
+    <string name="str_date_naiss">Date Naissance</string>
+    <string name="str_lieu_naiss">Lieu Naissance</string>
+    <string name="str_sexe">Genre</string>
+    <string name="str_sit_fam">Situation familiale</string>
+    <string name="str_fumeur">Fumeur</string>
+    <string name="str_handicape">Handicapé</string>
+    <string name="str_doc_type">Type Doc. Id.</string>
+    <string name="str_doc_num">Numéro Doc. Id.</string>
+    <string name="str_email">E-mail</string>
+    <string name="str_gsm">N° Phone</string>
+    <string name="str_profession">Profession</string>
+
+    <string name="left_str_nom">Nom</string>
+    <string name="left_str_prenom">Prénom</string>
+    <string name="left_str_pays">Pays</string>
+    <string name="left_str_adresse">Adresse</string>
+    <string name="left_str_naiss">Naissance</string>
+    <string name="left_str_sexe">Genre</string>
+    <string name="left_str_sit_fam">Sit. Fam.</string>
+    <string name="letf_str_fumeur">Fumeur</string>
+    <string name="left_str_handicape">Handicapé</string>
+    <string name="left_str_doc_idendite">Piède Id.</string>
+    <string name="left_str_email">E-mail</string>
+    <string name="left_str_gsm">N° Phone</string>
+    <string name="left_str_profession">Profession</string>
+
+    <string name="str_ok">OK</string>
+    <string name="msg_loading_resa">Chargement des données</string>
+    <string name="msg_saving_resa">Mise à jour des données</string>
+
+    <string name="str_update_client">Mettre à jour</string>
+    <string name="str_oui">Oui</string>
+    <string name="str_non">Non</string>
+    <string name="str_masculin">Masculin</string>
+    <string name="str_feminin">Féminin </string>
+    <string name="str_celibataire">Célibataire</string>
+    <string name="str_marie">Marié(e)</string>
+    <string name="str_divorce">Divorcé(e)</string>
+
+    <string name="pays_prompt">Votre pays</string>
+    <string name="type_doc_prompt">Type document</string>
+    <string name="msg_close">Retourner à la page précédente</string>
+
+    <string name="msg_erreur_serveur">Erreur de connexion au serveur.\nVeuillez réessayer s\'il vous plait !</string>
+    <string name="msg_pas_de_connexion">Connexion Internet non disponible.</string>
+
+    <string name="msg_succes_update">Mise à jour effectuée avec succès</string>
+    <string name="msg_echec_update">Echec de mise à jour. \nVeulliez réessayer s\'il vous plait !</string>
+    <string name="msg_pas_de_donnees_client">Pas de client pour cette référence de réservation</string>
+    <string name="champs_requis">Champ requis !</string>
+    <string name="msg_mail_invalide">E-mail invalide !</string>
+    <string name="msg_exception">Problème du Serveur</string>
+    <string name="apk_file">MY HOTIX CHECK IN.apk</string>
+    <string name="retry">Réessayer</string>
+    <string name="hotix">Hotix ©\nVersion : </string>
+    <string name="msg_connected">Vous êtes connectés</string>
+    <string name="show_date_naissance">Date Naissance</string>
+    <string name="show_fumeur">Fumeur</string>
+    <string name="show_handicap">Handicap</string>
+    <string name="ask_update">Voulez-vous mettre à jour cette réservation ? </string>
+    <string name="ok">Confirmer</string>
+    <string name="no">Annuler</string>
+    <string name="version">Version</string>
+    <string name="help">A propos</string>
+    <string name="title_activity_about" translatable="false">AboutActivity</string>
+    <string name="a">1/7 :Recherche par référence Resa</string>
+    <string name="b">2/7 :Détails client(s) de la réservation</string>
+    <string name="c">3/7 :Possibilié de mettre à jour les clients un par un </string>
+    <string name="d">4/7 :Avoir confirmation pour mettre à jour la réservation</string>
+    <string name="e">5/7 :Contrôle des champs requis</string>
+    <string name="f">6/7 :Mise à jour avec succés</string>
+    <string name="g">7/7 :Paramètrage</string>
+    <string name="serveur">Serveur</string>
+    <string name="affichage">Affichage</string>
+    <string name="show">Affiché</string>
+    <string name="hide">Caché</string>
+    <string name="mode_update">Mode de màj Resa </string>
+    <string name="update_pax">Màj par Pax </string>
+    <string name="oui">Oui</string>
+    <string name="non">Non</string>
+    <string name="animation">Animer le fond d\'écran</string>
+    <string name="options">Options</string>
+    <string name="str_city">Cité</string>
+    <string name="str_code_postal">Code Postal</string>
+    <string name="left_str_city">Cité</string>
+    <string name="left_str_code_postal">C. Postal</string>
+    <string name="error_load_data">Problème de chargment des données</string>
+    <string name="email_requis">L\'Email est obligatoire</string>
+    <string name="numid_requis">Le N° d\'identité est obligatoire</string>
+    <string name="mr">Mr</string>
+    <string name="SIGNATURE">Signature</string>
+    <string name="mme">Mme</string>
+    <string name="mlle">Mlle</string>
+    <string name="civilite">Civilié</string>
+    <string name="hotel">Hôtel</string>
+    <string name="code_hotel">Code Hôtel</string>
+    <string name="updating">Téléchargement ..</string>
+    <string name="update">Mettre à jour</string>
+    <string name="close">Fermer</string>
+    <string name="showcli">Afficher détails</string>
+    <string name="autoupdate">Mise à jour automatique</string>
+    <string name="check_update">Vérifier la version</string>
+    <string name="last_version_ok">Vous avez la dernière version. L\'application est à jour</string>
+    <string name="last_version_no">Vous n\'avez  pas la dernière version. Cliquer sur "OK" pour la mettre à jour</string>
+
+    <string name="hello">Hello World, CaptureSignatureActivity!</string>
+    <string name="external_dir">MyHotixCheckInSign</string>
+    <string name="save">Valider</string>
+    <string name="clear">Effacer</string>
+    <string name="cancel">Annuler</string>
+    <string name="yourname">Votre nom</string>
+    <string name="plzyourname">S\'il vous plaît  entrez votre nom</string>
+    <string name="signature">Signer ci-dessous ..</string>
+</resources>
+
