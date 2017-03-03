@@ -36,25 +36,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpResponseException;
-import org.ksoap2.transport.HttpTransportSE;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import hotix.myhotix.checkin.R;
@@ -62,7 +48,6 @@ import hotix.myhotix.checkin.entities.PieceIdentite;
 import hotix.myhotix.checkin.entities.Resa;
 import hotix.myhotix.checkin.entities.ResponsePieceIdentite;
 import hotix.myhotix.checkin.entities.ResponseResa;
-import hotix.myhotix.checkin.utilities.HttpHandler;
 import hotix.myhotix.checkin.utilities.UpdateChecker;
 
 public class SplashScreen extends AppCompatActivity {
@@ -141,11 +126,11 @@ public class SplashScreen extends AppCompatActivity {
                 final int DRAWABLE_TOP = 1;
                 final int DRAWABLE_RIGHT = 2;
                 final int DRAWABLE_BOTTOM = 3;
-                ////Log.i("Clavier", "Here");
+
                 if (event.getAction() == MotionEvent.ACTION_UP) {
-                    // //Log.i("Clavier", "ACTION_UP");
+
                     if (event.getRawX() >= (editSearch.getRight() - editSearch.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        //  //Log.i("Clavier", "drawable");
+
                         if (!editSearch.getText().toString().trim().equals("")) {
                             refResa = editSearch.getText().toString().trim();
                             InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -169,7 +154,7 @@ public class SplashScreen extends AppCompatActivity {
 
                         return true;
                     } else {
-                        // //Log.i("Clavier", "Search");
+
                         InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         im.showSoftInput(editSearch, 0);
                     }
@@ -396,7 +381,7 @@ public class SplashScreen extends AppCompatActivity {
             case "1866":
                 // Badira
                 if (pref.getBoolean("ANIMATION", true)) {
-                    // //Log.i("Animation", "TRUE");
+
                     AnimationDrawable animation = new AnimationDrawable();
                     animation.addFrame(getResources().getDrawable(R.drawable.reception), 5000);
                     animation.addFrame(getResources().getDrawable(R.drawable.receptiona), 5000);
@@ -410,7 +395,7 @@ public class SplashScreen extends AppCompatActivity {
                     // start the animation!
                     animation.start();
                 } else {
-                    ////Log.i("Animation", "TRUE");
+
                     background.setImageResource(R.drawable.reception);
                 }
                 break;
@@ -484,9 +469,9 @@ public class SplashScreen extends AppCompatActivity {
             SharedPreferences sp = PreferenceManager
                     .getDefaultSharedPreferences(this);
             URL = sp.getString("SERVEUR", "");
-            ////Log.i("URL", URL);
+
             URL = "http://" + URL + "/hngwebsetup/webservice/myhotix.asmx";
-            //Log.i("URL", URL);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -494,7 +479,7 @@ public class SplashScreen extends AppCompatActivity {
     }
 
     private void ShowSnakeBarInfo(int i) {
-        ////Log.i("ShowSnakeBarInfo", String.valueOf(i));
+
         Snackbar snackbar;
 
         switch (i) {
@@ -551,850 +536,23 @@ public class SplashScreen extends AppCompatActivity {
                 ViewGroup group6 = (ViewGroup) snackbar.getView();
                 group6.setBackgroundColor(ContextCompat.getColor(SplashScreen.this, R.color.colorPrimary));
                 snackbar.show();*/
-                Log.i("Asynck Pays", wsPaysApi.getStatus().toString());
+                //Log.i("Asynck Pays", wsPaysApi.getStatus().toString());
                 wsPaysApi = null;
                 wsPaysApi = new HttpRequestTaskPays();
                 wsPIApi = new HttpRequestTaskIdentite();
 
                 RetryGetData();
-                Log.i("Asynck Pays2", wsPaysApi.getStatus().toString());
+                //Log.i("Asynck Pays2", wsPaysApi.getStatus().toString());
 
                 break;
         }
     }
 
 
-    /* Asynck Task */
-    /******************************************************************/
-    /*********************       OLD         **************************/
-    /******************************************************************/
-
-    public class AsyncGetReservation extends AsyncTask<String, String, String> {
-
-        HttpTransportSE androidHttpTransport;
-        SoapObject response = null;
-
-        @Override
-        protected void onPreExecute() {
-
-            customProgress1.setMessage(getResources().getText(
-                    R.string.msg_loading_resa));
-            customProgress1.setCancelable(false);
-            if (customProgress1 != null) {
-                customProgress1.show();
-            }
-
-            super.onPreExecute();
-        }
-
-        protected String doInBackground(String... params) {
-
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_GET_RESA);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            PropertyInfo pi_resa_ref = new PropertyInfo();
-            pi_resa_ref.setName("resaRef");
-            pi_resa_ref.setValue(refResa);
-            pi_resa_ref.setType(String.class);
-            request.addProperty(pi_resa_ref);
-
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(request);
-            androidHttpTransport = new HttpTransportSE(getURL(), 6000);
-
-            try {
-                androidHttpTransport.call(SOAP_ACTION_GET_RESA, envelope);
-                response = (SoapObject) envelope.getResponse();
-            } catch (SocketTimeoutException e) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        androidHttpTransport.reset();
-                        ////Log.i("SocketTimeoutException", "Here");
-
-                        //3 ShowErrorConnectionDialog();
-                        exception = true;
-                        response = null;
-                    }
-                });
-
-            } catch (HttpResponseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                //  //Log.i("HttpResponseException", "Here");
-                //ShowErrorConnectionDialog();
-                exception = true;
-                response = null;
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                exception = true;
-                // //Log.i("IOException", "Here");
-                //ShowErrorConnectionDialog();
-                response = null;
-            } catch (XmlPullParserException e) {
-                // TODO Auto-generated catch block
-
-                e.printStackTrace();
-                // //Log.i("XmlPullParserException", "Here");
-                exception = true;
-                //ShowErrorConnectionDialog();
-                response = null;
-                exception = true;
-            }
-            if (response != null) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        //Log.i("Response", response.toString());
-
-                        SoapObject Reservations = new SoapObject();
-                        SoapObject Reservation = new SoapObject();
-                        // Lecture de fichier XML
-                        Reservations = (SoapObject) response.getProperty(0);
-                        // //Log.i("Reservations", Reservations.toString());
-
-                        for (int i = 0; i < Reservations.getPropertyCount(); i++) {
-                            Reservation = (SoapObject) Reservations.getProperty(i);
-                            // //Log.i("Reservation", Reservation.toString());
-                            // ID
-                            Client curClient = new Client();
-                            curClient.setClientId(Integer.parseInt(Reservation.getProperty(
-                                    "ClientId").toString()));
-
-                            if (curClient.getClientId() != 0) {
-                                // Civilite
-                                if (Reservation.getProperty("Civilite").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setCivilite(1);
-                                else
-                                    curClient.setCivilite(Integer.parseInt(Reservation.getProperty("Civilite").toString()));
-
-                                // NOM
-                                if (Reservation.getProperty("ClientNom").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setClientNom("");
-                                else
-                                    curClient.setClientNom(Reservation.getProperty(
-                                            "ClientNom").toString());
-
-                                // PRENOM
-                                if (Reservation.getProperty("ClientPrenom").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setClientPrenom("");
-                                else
-                                    curClient.setClientPrenom(Reservation.getProperty(
-                                            "ClientPrenom").toString());
-
-                                // DATE NAISSANCE
-                                if (Reservation.getProperty("DateNaiss").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setDateNaiss("");
-                                else {
-                                    curClient.setDateNaiss(FormatDate(Reservation
-                                            .getProperty("DateNaiss").toString()));
-
-                                   /* InitDateNaissance(FormatDate(Reservation.getProperty(
-                                            "DateNaiss").toString()));*/
-                                }
-
-                                // LIEU NAISSANCE
-                                if (Reservation.getProperty("LieuNaiss").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setLieuNaiss("");
-                                else
-                                    curClient.setLieuNaiss(Reservation.getProperty(
-                                            "LieuNaiss").toString());
-
-                                // City
-                                if (Reservation.getProperty("City").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setCity("");
-                                else
-                                    curClient.setCity(Reservation.getProperty(
-                                            "City").toString());
-                                // CodePostal
-                                if (Reservation.getProperty("CodePostal").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setCodePostal("");
-                                else
-                                    curClient.setCodePostal(Reservation.getProperty(
-                                            "CodePostal").toString());
-
-                                // PAYS
-                                curClient.setPays(Integer.parseInt(Reservation.getProperty(
-                                        "Pays").toString()));
-
-                                // ADRESSE
-                                if (Reservation.getProperty("Adresse").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setAdresse("");
-                                else
-                                    curClient.setAdresse(Reservation.getProperty("Adresse")
-                                            .toString());
-
-
-                                // SEXE
-                                if (Reservation.getProperty("Sexe").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setSexe("M");
-                                else
-                                    curClient.setSexe(Reservation.getProperty("Sexe")
-                                            .toString());
-
-                                // SITUATION FAMILIALE
-                                if (Reservation.getProperty("SitFam").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setSitFam("C");
-                                else
-                                    curClient.setSitFam(Reservation.getProperty("SitFam")
-                                            .toString());
-
-                                // FUMEUR
-                                if (Reservation.getProperty("Fumeur").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setFumeur(0);
-                                else if (Reservation.getProperty("Fumeur").toString()
-                                        .equals("True"))
-                                    curClient.setFumeur(1);
-                                else
-                                    curClient.setFumeur(0);
-
-                                // HANDICAPE
-                                if (Reservation.getProperty("Handicape").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setHandicape(0);
-                                else if (Reservation.getProperty("Handicape").toString()
-                                        .equals("True"))
-                                    curClient.setHandicape(1);
-                                else
-                                    curClient.setHandicape(0);
-
-                                // TYPE DOCUMENT IDENDITE
-                                if (Reservation.getProperty("DocTypeId").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setNatureDocIdentite(1);
-                                else
-                                    curClient.setNatureDocIdentite(Integer
-                                            .parseInt(Reservation.getProperty("DocTypeId")
-                                                    .toString()));
-
-                                // NUM DOCUMENT IDENDITE
-                                if (Reservation.getProperty("DocIdNum").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setNumDocIdentite("");
-                                else
-                                    curClient.setNumDocIdentite(Reservation.getProperty(
-                                            "DocIdNum").toString());
-
-                                // E-MAIL
-                                if (Reservation.getProperty("Email").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setEmail("");
-                                else
-                                    curClient.setEmail(Reservation.getProperty("Email")
-                                            .toString());
-
-                                // GSM
-                                if (Reservation.getProperty("Gsm").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setGsm("");
-                                else
-                                    curClient.setGsm(Reservation.getProperty("Gsm")
-                                            .toString());
-
-                                // PROFESSION
-                                if (Reservation.getProperty("Profession").toString()
-                                        .equals("anyType{}"))
-                                    curClient.setProfession("");
-                                else
-                                    curClient.setProfession(Reservation.getProperty(
-                                            "Profession").toString());
-                                curClients.add(curClient);
-                            }
-                        }
-                    }
-                });
-
-
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            if (customProgress1 != null) {
-                customProgress1.hide();
-            }
-            androidHttpTransport.reset();
-
-            if (curClients.size() != 0) {
-
-                ////Log.i("Clients", curClients.toString());
-                Intent intent = new Intent(SplashScreen.this, ClientsActivity.class);
-                intent.putExtra("NBR_CLIENTS", curClients.size());
-                intent.putExtra("RESA_REF", refResa);
-                intent.putExtra("CLIENTS", curClients);
-                intent.putExtra("PAYS", listPays);
-                intent.putExtra("DOCS", listDocTypes);
-                startActivity(intent);
-                for (Client cli : curClients) {
-                    Log.i("Splash Activity Client", cli.toString());
-                }
-
-
-            } else {
-                if (exception)
-                    ShowSnakeBarInfo(2);
-                else
-                    ShowSnakeBarInfo(0);
-            }
-
-            super.onPostExecute(result);
-        }
-    }
-
-    public class AsyncGetAllPays extends
-            AsyncTask<String, String, ArrayList<ItemSpinner>> {
-        HttpTransportSE androidHttpTransport;
-        SoapObject response = null;
-
-        @Override
-        protected void onCancelled() {
-            // TODO Auto-generated method stub
-            // //Log.i("onCancelled", "AsyncGetAllPays");
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            // //Log.i("AsyncGetAllPays", "onPreExecute");
-            customProgress1.setMessage(getResources().getText(
-                    R.string.msg_loading_resa));
-
-            customProgress1.show();
-
-            super.onPreExecute();
-        }
-
-        protected ArrayList<ItemSpinner> doInBackground(String... params) {
-            ////Log.i("AsyncGetAllPays", "doInBackground");
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME_PAYS);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(request);
-            androidHttpTransport = new HttpTransportSE(getURL(), 5000);
-
-            try {
-                androidHttpTransport.call(SOAP_ACTION_PAYS, envelope);
-                response = (SoapObject) envelope.getResponse();
-
-            } catch (SocketTimeoutException e) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        customProgress1.hide();
-                        androidHttpTransport.reset();
-                        //Log.i("SocketTimeoutException", "Here");
-                        exception = true;
-                        response = null;
-                    }
-                });
-
-            } catch (HttpResponseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        //Log.i("HttpResponseException", "Here");
-                        customProgress1.hide();
-                        exception = true;
-                        response = null;
-                    }
-                });
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-
-
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        //Log.i("IOException", "Here");
-                        customProgress1.hide();
-                        exception = true;
-                        response = null;
-                    }
-                });
-            } catch (XmlPullParserException e) {
-                // TODO Auto-generated catch block
-                exception = true;
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        //Log.i("XmlPullParserException", "Here");
-                        customProgress1.hide();
-                        exception = true;
-                        response = null;
-                    }
-                });
-
-
-            }
-
-            if (response != null) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                    }
-                });
-
-                ////Log.i("AsyncGetAllPays", response.toString());
-                ItemSpinner item;
-                SoapObject Pays = new SoapObject();
-                SoapObject UnPays = new SoapObject();
-
-                //Log.i("Pays", response.toString());
-
-                // Lecture de fichier XML
-                Pays = (SoapObject) response.getProperty(0);
-
-                ////Log.i("N° PAYS", String.valueOf(Pays.getPropertyCount()));
-
-                for (int i = 0; i < Pays.getPropertyCount(); i++) {
-
-                    UnPays = (SoapObject) Pays.getProperty(i);
-                    try {
-                        item = new ItemSpinner();
-                        item.setId(Integer.parseInt(UnPays
-                                .getProperty("PaysId").toString()));
-                        item.setLabel(UnPays.getProperty("PaysNom").toString());
-                        item.setTel(UnPays.getProperty("PaysTel").toString());
-                        // DATE NAISSANCE
-                        if (UnPays.getProperty("PaysTel").toString()
-                                .equals("anyType{}"))
-                            item.setTel("");
-                        else {
-                            item.setTel(UnPays
-                                    .getProperty("PaysTel").toString());
-                        }
-
-                        listPays.add(item);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                //Log.i("PAYS", "Empty");
-                                customProgress1.hide();
-                                exception = true;
-                                ShowSnakeBarInfo(5);
-                                Log.i("PAYS", "Empty");
-
-                            }
-                        });
-                    }
-                }
-
-            }
-
-            return listPays;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<ItemSpinner> listPays) {
-            androidHttpTransport.reset();
-            // //Log.i("AsyncGetAllPays", "onPostExecute");
-            //DisplaySpinner(spPays, pays, listPays);
-            if (listPays.size() == 0) {
-                if (exception) {
-                    Log.i("PAYS", "onPostExecute");
-                    ShowSnakeBarInfo(5);
-                } else
-                    ShowSnakeBarInfo(0);
-            } else {
-                //Log.i("ALL_PAYS", listPays.toString());
-
-             /*   Bundle value = new Bundle();
-                value.putParcelableArrayList("PAYS", listPays);*/
-                wsPIApi.execute();
-                //customProgress1.hide();
-            }
-            //wsPI.execute();
-            super.onPostExecute(listPays);
-        }
-    }
-
-    public class AsyncGetAllPiecesIdendite extends
-            AsyncTask<String, String, ArrayList<ItemSpinner>> {
-        HttpTransportSE androidHttpTransport;
-        SoapObject response = null;
-
-        @Override
-        protected void onPreExecute() {
-
-            super.onPreExecute();
-        }
-
-        protected ArrayList<ItemSpinner> doInBackground(String... params) {
-
-            SoapObject request = new SoapObject(NAMESPACE,
-                    METHOD_NAME_PIECE_IDENDITE);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(request);
-            androidHttpTransport = new HttpTransportSE(getURL(), 5000);
-
-            try {
-                androidHttpTransport.call(SOAP_ACTION_PIECE_IDENDITE, envelope);
-                response = (SoapObject) envelope.getResponse();
-            } catch (SocketTimeoutException e) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        androidHttpTransport.reset();
-                        // //Log.i("SocketTimeoutException", "Here");
-//                        btn_ok.setEnabled(false);
-//                        btn_update.setEnabled(false);
-                        exception = true;
-
-                        response = null;
-                    }
-                });
-
-            } catch (HttpResponseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                ////Log.i("HttpResponseException", "Here");
-
-                response = null;
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                ////Log.i("IOException", "Here");
-                exception = true;
-
-                response = null;
-            } catch (XmlPullParserException e) {
-                // TODO Auto-generated catch block
-                exception = true;
-
-                e.printStackTrace();
-                ////Log.i("XmlPullParserException", "Here");
-
-                response = null;
-            }
-
-            if (response != null) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-//                        btn_ok.setEnabled(true);
-//                        btn_update.setEnabled(true);
-                    }
-                });
-
-                ItemSpinner item;
-                SoapObject DocTypes = new SoapObject();
-                SoapObject DocType = new SoapObject();
-
-                // Lecture de fichier XML
-                DocTypes = (SoapObject) response.getProperty(0);
-
-                for (int i = 0; i < DocTypes.getPropertyCount(); i++) {
-                    DocType = (SoapObject) DocTypes.getProperty(i);
-                    try {
-                        item = new ItemSpinner();
-                        item.setId(Integer.parseInt(DocType.getProperty(
-                                "PieceId").toString()));
-                        item.setLabel(DocType.getProperty("PieceLabel")
-                                .toString());
-
-                        listDocTypes.add(item);
-                    } catch (Exception e) {
-                        exception = true;
-
-                    }
-                }
-            }
-
-            return listDocTypes;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<ItemSpinner> listDocTypes) {
-            if (customProgress1 != null) {
-                customProgress1.hide();
-            }
-            androidHttpTransport.reset();
-            //  DisplaySpinner(spDocTypes, docTypes, listDocTypes);
-            if (listDocTypes.size() == 0) {
-                if (exception) {
-                    Log.i("Asyn", "DOC");
-                    ShowSnakeBarInfo(5);
-                } else
-                    ShowSnakeBarInfo(0);
-            } else {
-                //Log.i("ALL_IDENTIY", listDocTypes.toString());
-
-            }
-            super.onPostExecute(listDocTypes);
-        }
-    }
-
-
-    private String FormatDate(String s) {
-
-        // s=yyyymmdd
-        return s.substring(4, 6) + "/" + s.substring(6, 8) + "/"
-                + s.substring(0, 4);
-        // return MM/dd/yyyy
-    }
-
-
-    /******************************************************************/
-    /******************************************************************/
     /******************************************************************/
 
     private String TAG = SplashScreen.class.getSimpleName();
     private ListView lv;
-    ArrayList<HashMap<String, String>> contactList;
-
-
-    /*********************************************
-     * GET PAYS
-     *********************************************/
-
-    public class AsyncGetAllPaysAPI extends
-            AsyncTask<String, String, ArrayList<ItemSpinner>> {
-
-
-        @Override
-        protected void onCancelled() {
-            // TODO Auto-generated method stub
-            // //Log.i("onCancelled", "AsyncGetAllPays");
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            // //Log.i("AsyncGetAllPays", "onPreExecute");
-            customProgress1.setMessage(getResources().getText(
-                    R.string.msg_loading_resa));
-
-            customProgress1.show();
-
-            super.onPreExecute();
-        }
-
-        protected ArrayList<ItemSpinner> doInBackground(String... params) {
-
-
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            String url = getURLAPI() + "GetAllPays";
-            String jsonStr = sh.makeServiceCall(url);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                try {
-                    JSONArray contacts = new JSONArray(jsonStr);
-                    ItemSpinner item;
-                    // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
-                        String id = c.getString("id");
-                        String name = c.getString("name");
-                        String code = c.getString("code");
-
-
-                        item = new ItemSpinner();
-                        item.setId(Integer.parseInt(id));
-                        item.setLabel(name.toString());
-                        item.setTel(code.toString());
-
-                        listPays.add(item);
-                    }
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                        customProgress1.hide();
-                        exception = true;
-                        ShowSnakeBarInfo(5);
-                    }
-                });
-            }
-
-            return listPays;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<ItemSpinner> listPays) {
-
-            if (listPays.size() == 0) {
-                if (exception) {
-                    Log.i("PAYS", "onPostExecute");
-                    ShowSnakeBarInfo(5);
-                } else
-                    ShowSnakeBarInfo(0);
-            } else {
-
-                wsPIApi.execute();
-
-            }
-
-            super.onPostExecute(listPays);
-        }
-    }
-
-
-    /**********************************************
-     * GET Doc Identity
-     **********************************************/
-
-    public class AsyncGetAllPiecesIdenditeAPI extends
-            AsyncTask<String, String, ArrayList<ItemSpinner>> {
-
-
-        @Override
-        protected void onCancelled() {
-            // TODO Auto-generated method stub
-            // //Log.i("onCancelled", "AsyncGetAllPays");
-            super.onCancelled();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            // //Log.i("AsyncGetAllPays", "onPreExecute");
-            super.onPreExecute();
-        }
-
-        protected ArrayList<ItemSpinner> doInBackground(String... params) {
-
-
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            String url = getURLAPI() + "GetAllPiecesIdendite";
-            String jsonStr = sh.makeServiceCall(url);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                try {
-
-                    // Getting JSON Array node
-                    JSONArray contacts = new JSONArray(jsonStr);
-                    ItemSpinner item;
-                    // looping through All Contacts
-                    for (int i = 0; i < contacts.length(); i++) {
-                        JSONObject c = contacts.getJSONObject(i);
-                        String id = c.getString("id");
-                        String name = c.getString("name");
-
-
-                        item = new ItemSpinner();
-                        item.setId(Integer.parseInt(id));
-                        item.setLabel(name.toString());
-
-
-                        listDocTypes.add(item);
-                    }
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                        customProgress1.hide();
-                        exception = true;
-                        ShowSnakeBarInfo(5);
-                    }
-                });
-            }
-
-            return listDocTypes;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<ItemSpinner> listPays) {
-            if (customProgress1 != null) {
-                customProgress1.hide();
-            }
-
-            //  DisplaySpinner(spDocTypes, docTypes, listDocTypes);
-            if (listDocTypes.size() == 0) {
-                if (exception) {
-                    Log.i("Asyn", "DOC");
-                    ShowSnakeBarInfo(5);
-                } else
-                    ShowSnakeBarInfo(0);
-            } else {
-                //Log.i("ALL_IDENTIY", listDocTypes.toString());
-
-            }
-            super.onPostExecute(listDocTypes);
-        }
-    }
-
 
     /*****************************************************************/
 
@@ -1414,9 +572,9 @@ public class SplashScreen extends AppCompatActivity {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 response = restTemplate.getForObject(url, ResponsePieceIdentite.class);
-                Log.i(TAG, response.toString());
-                Log.i(TAG, String.valueOf(response.isStatus()));
-                Log.i(TAG, String.valueOf(response.getData().size()));
+                //Log.i(TAG, "Pays :" + response.toString());
+                Log.i(TAG, "Pays :" + String.valueOf(response.isStatus()));
+                Log.i(TAG, "Pays :" + String.valueOf(response.getData().size()));
                 return response;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -1456,7 +614,7 @@ public class SplashScreen extends AppCompatActivity {
                     R.string.msg_loading_resa));
 
             customProgress1.show();
-            Log.i(TAG, "GET Pays");
+            //Log.i(TAG, "GET Pays");
         }
     }
 
@@ -1471,9 +629,9 @@ public class SplashScreen extends AppCompatActivity {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 response = restTemplate.getForObject(url, ResponsePieceIdentite.class);
-                Log.i(TAG, response.toString());
-                Log.i(TAG, String.valueOf(response.isStatus()));
-                Log.i(TAG, String.valueOf(response.getData().size()));
+                //Log.i(TAG, "Pieces Ident :" + response.toString());
+                Log.i(TAG, "Pieces Ident :" + String.valueOf(response.isStatus()));
+                Log.i(TAG, "Pieces Ident :" + String.valueOf(response.getData().size()));
                 return response;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -1510,7 +668,7 @@ public class SplashScreen extends AppCompatActivity {
                     R.string.msg_loading_resa));
 
             customProgress1.show();
-            Log.i(TAG, "GET Pieces Identite");
+            //Log.i(TAG, "GET Pieces Identite");
         }
     }
 
@@ -1525,9 +683,9 @@ public class SplashScreen extends AppCompatActivity {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 response = restTemplate.getForObject(url, ResponseResa.class);
-                Log.i(TAG, response.toString());
-                Log.i(TAG, String.valueOf(response.isStatus()));
-                Log.i(TAG, String.valueOf(response.getData().size()));
+                //Log.i(TAG, "Reservation :" + response.toString());
+                Log.i(TAG, "Reservation :" + String.valueOf(response.isStatus()));
+                Log.i(TAG, "Reservation :" + String.valueOf(response.getData().size()));
                 return response;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -1558,6 +716,7 @@ public class SplashScreen extends AppCompatActivity {
                     curClient.setPays(r.getPaysId());
                     curClient.setAdresse(r.getAddresse());
                     curClient.setDateNaiss(r.getDateNaissance());
+                    //Log.i("DebugZied", curClient.getDateNaiss());
                     curClient.setLieuNaiss(r.getLieu());
                     curClient.setSexe(r.getSexe());
                     curClient.setSitFam(r.getSituation());
@@ -1570,6 +729,7 @@ public class SplashScreen extends AppCompatActivity {
                     curClient.setFumeur(r.getFumeur());
                     curClients.add(curClient);
                 }
+
                 Intent intent = new Intent(SplashScreen.this, ClientsActivity.class);
                 intent.putExtra("NBR_CLIENTS", curClients.size());
                 intent.putExtra("RESA_REF", refResa);
@@ -1577,15 +737,14 @@ public class SplashScreen extends AppCompatActivity {
                 intent.putExtra("PAYS", listPays);
                 intent.putExtra("DOCS", listDocTypes);
                 startActivity(intent);
+               /*
                 for (Client cli : curClients) {
                     Log.i("Splash Activity Client", cli.toString());
-                }
+                }*/
             } else {
-                if(!response.isStatus())
-                {
+                if (!response.isStatus()) {
                     ShowSnakeBarInfo(2);
-                }
-                else {
+                } else {
                     ShowSnakeBarInfo(1);
                 }
 
@@ -1600,11 +759,10 @@ public class SplashScreen extends AppCompatActivity {
                     R.string.msg_loading_resa));
             ResaRef = refResa;
             customProgress1.show();
-            Log.i(TAG, "GET Reservation");
+            //Log.i(TAG, "GET Reservation");
         }
     }
 
-    /**************************************************************/
     public String getURLAPI() {
         String URL = null;
         try {

@@ -30,13 +30,9 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,12 +51,6 @@ import hotix.myhotix.checkin.utilities.HttpHandler;
 
 public class OneFragment extends Fragment implements View.OnClickListener {
 
-    //region Variables
-    static final int DATE_DIALOG_ID = 0;
-    static int y1, m1, d1;
-    public final String NAMESPACE = "http://tempuri.org/";
-    public final String SOAP_ACTION_UPDATE_RESA = "http://tempuri.org/UpdateReservationInfos";
-    public final String METHOD_NAME_UPDATE_RESA = "UpdateReservationInfos";
 
     EditText edtNom, edtPrenom, edtAdresse, edtDateNaiss,
             edtLieuNaiss, edtNumDoc, edtEmail, edtProfession, edtCity, edtCodePostal;
@@ -87,12 +77,11 @@ public class OneFragment extends Fragment implements View.OnClickListener {
     DatePickerDialog.OnDateSetListener date;
     LinearLayout layoutBirth, layoutFumeur, layoutHandicap, layoutNom, layoutPrenom, layoutaddress, layoutcity,
             layoutcodepostal, layoutgendr, layoutpays, layoutprofession, layoutemail, layoutdoc, layoutsitfam, layoutgsm;
-    SharedPreferences pref;
-    private DatePickerDialog DatePickerDialog;
+
     private SimpleDateFormat dateFormatter;
     ScrollView scroll;
     int Nbre = 1;
-    //endregion
+
 
     public OneFragment() {
         // Required empty public constructor
@@ -114,7 +103,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i("FRAGMENT", "onCreate :");
+        Log.i("FRAGMENT", "onCreate");
         resaRef = getArguments().getString("RESA_REF");
         curClient = getArguments().getParcelable("CLIENT");
         Nbre = getArguments().getInt("NBRE_CLIENT");
@@ -130,7 +119,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_one, container, false);
-        //Log.i("FRAGMENT", "onCreateView");
+        Log.i("FRAGMENT", "onCreateView");
         scroll = (ScrollView) view.findViewById(R.id.scrollView1);
         customProgress1 = new ProgressDialog(getActivity());
         customProgress1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -296,7 +285,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
             if (!sp.getBoolean("PAX", true)) {
                 btn_update.setVisibility(View.GONE);
             } else {
-                btn_update.setVisibility(View.VISIBLE);
+                btn_update.setVisibility(View.GONE);
             }
 
 
@@ -321,7 +310,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                Log.i("Here", "OnDateSetListener ");
+                //Log.i("Here", "OnDateSetListener ");
                 updateLabel();
             }
 
@@ -344,19 +333,19 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i("FRAGMENT", "onActivityCreated :" + curClient.toString());
+        Log.i("FRAGMENT", "onActivityCreated " + curClient.toString());
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onStart() {
-        Log.i("FRAGMENT", "onStart :" + curClient.toString());
+        Log.i("FRAGMENT", "onStart " + curClient.toString());
         super.onStart();
     }
 
     @Override
     public void onResume() {
-        Log.i("FRAGMENT", "onResume :" + curClient.toString());
+        Log.i("FRAGMENT", "onResume " + curClient.toString());
         listCivi = new ArrayList<ItemSpinner>();
         //Log.i("RESA_REF_FRAGMENT", resaRef);
         //Log.i("CLIENT_FRAGMENT", curClient.toString());
@@ -377,13 +366,13 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onPause() {
-        Log.i("FRAGMENT", "onPause :" + curClient.toString());
+        Log.i("FRAGMENT", "onPause " + curClient.toString());
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Log.i("FRAGMENT", "onStop :" + curClient.toString());
+        Log.i("FRAGMENT", "onStop " + curClient.toString());
         getDataClient();
         if (wsUpdate != null)
             wsUpdate.cancel(true);
@@ -398,22 +387,23 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onDetach() {
-        Log.i("FRAGMENT", "onDetach :" + curClient.toString());
+        Log.i("FRAGMENT", "onDetach " + curClient.toString());
         super.onDetach();
     }
 
     @Override
     public void onDestroyView() {
-        Log.i("FRAGMENT", "onDestroyView  :" + curClient.toString());
+        Log.i("FRAGMENT", "onDestroyView  " + curClient.toString());
         super.onDestroyView();
     }
 
     private void updateLabel() {
 
-        String myFormat = "MM/dd/yyyy"; //In which you need put here
+        String myFormat = "yyyy/MM/dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
         edtDateNaiss.setText(sdf.format(myCalendar.getTime()));
+        Log.i("Here", "Update Date Picker 1");
     }
 
     private void DisplaySpinner(Spinner sp, ArrayList<String> strList,
@@ -432,8 +422,8 @@ public class OneFragment extends Fragment implements View.OnClickListener {
     private int GetIdFromSpinner(Spinner sp, ArrayList<String> strList,
                                  ArrayList<ItemSpinner> liste) {
         int val = 0;
-        Log.i("strList", strList.toString());
-        Log.i("strList", liste.toString());
+        //Log.i("strList", strList.toString());
+        //Log.i("strList", liste.toString());
         for (int i = 0; i < strList.size(); i++) {
             if (liste.get(i).getLabel().equals(sp.getSelectedItem().toString())) {
                 val = liste.get(i).getId();
@@ -540,8 +530,8 @@ public class OneFragment extends Fragment implements View.OnClickListener {
             curClient.setEmail(edtEmail.getText().toString()
                     .trim());
 
-            curClient.setDateNaiss(FormatDateyyyyMMdd(edtDateNaiss.getText().toString()));
-            Log.i("Here", curClient.getDateNaiss().toString());
+            curClient.setDateNaiss(edtDateNaiss.getText().toString());
+            Log.i("Here","curClient.getDateNaiss() ="+ curClient.getDateNaiss().toString());
             EmailValidator emVal = new EmailValidator();
 
             if ((layoutemail.getVisibility() == View.VISIBLE) && (edtEmail.getText().toString().trim().equals("")) && (!emVal.validate(edtEmail.getText().toString().trim()))) {
@@ -572,28 +562,20 @@ public class OneFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private String FormatDate(String s) {
-
-        // s=yyyymmdd
-        return s.substring(4, 6) + "/" + s.substring(6, 8) + "/"
-                + s.substring(0, 4);
-        // return MM/dd/yyyy
-    }
-
     private String FormatDateyyyyMMdd(String s) {
 
 
         // s= MM/dd/yyyy
         String ss = s.substring(6, 10) + s.substring(0, 2) + s.substring(3, 5);
         //Log.i("CONVERSION DATE :", " Date initial: " + s + " , Date final: " + ss);
-        return s.replace("/", "");
+        return ss;
         // return yyyyMMdd
     }
 
     private void setDataClient() {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(getActivity());
-        Log.i("SET DATA ", String.valueOf(Nbre) + ", SHOW CLIENTS =" + sp.getBoolean("SHOWCLIENTS", false));
+        //Log.i("SET DATA ", String.valueOf(Nbre) + ", SHOW CLIENTS =" + sp.getBoolean("SHOWCLIENTS", false));
 
         if (!sp.getBoolean("SHOWCLIENTS", false)) {
             if (Nbre == 1) {
@@ -681,8 +663,9 @@ public class OneFragment extends Fragment implements View.OnClickListener {
         //  setDateTimeField(curClient.getDateNaiss());
         try {
             myCalendar.setTime(dateFormatter.parse(curClient.getDateNaiss()));
+
             updateLabel();
-            Log.i("Here", "Set" + edtDateNaiss.getText().toString());
+            Log.i("Here", "edtDateNaiss.getText :" + edtDateNaiss.getText().toString());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -772,7 +755,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
             if (!sp.getBoolean("PAX", true)) {
                 btn_update.setVisibility(View.GONE);
             } else {
-                btn_update.setVisibility(View.VISIBLE);
+                btn_update.setVisibility(View.GONE);
             }
 
         } catch (Exception e) {
@@ -780,7 +763,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    AsyncUpdateReservationAPI wsUpdate;
+    HttpRequestTaskUpdateReservation wsUpdate;
 
     private String GetDateNaissanceFromEditTet() {
         String dateN = edtDateNaiss.getText().toString();
@@ -867,6 +850,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
             }
             newClient.setDateNaiss(GetDateNaissanceFromEditTet());
+            Log.i("Here"," newClient.setDateNaiss(GetDateNaissanceFromEditTet()) " );
             newClient.setEmail(edtEmail.getText().toString().trim());
             EmailValidator emVal = new EmailValidator();
 
@@ -881,7 +865,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                         customProgress1.setMessage(getResources().getText(R.string.msg_saving_resa));
                         //customProgress1.show();
                         Log.i("ClientToUpdate Fragment", newClient.toString());
-                        wsUpdate = new AsyncUpdateReservationAPI();
+                        wsUpdate = new HttpRequestTaskUpdateReservation(newClient);
                         wsUpdate.execute();
 
 
@@ -910,7 +894,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                     customProgress1.setMessage(getResources().getText(R.string.msg_saving_resa));
                     Log.i("ClientToUpdate Fragment", newClient.toString());
 
-                    wsUpdate = new AsyncUpdateReservationAPI();
+                    wsUpdate = new HttpRequestTaskUpdateReservation(newClient);
                     wsUpdate.execute();
                 } else {
                     edtNumDoc.setError(getResources().getText(
@@ -929,7 +913,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                         customProgress1.setMessage(getResources().getText(R.string.msg_saving_resa));
                         Log.i("ClientToUpdate Fragment", newClient.toString());
 
-                        wsUpdate = new AsyncUpdateReservationAPI();
+                        wsUpdate = new HttpRequestTaskUpdateReservation(newClient);
                         wsUpdate.execute();
                     } else {
                         edtEmail.setError(getResources().getText(
@@ -946,213 +930,10 @@ public class OneFragment extends Fragment implements View.OnClickListener {
                 customProgress1.setMessage(getResources().getText(R.string.msg_saving_resa));
                 //customProgress1.show();
                 Log.i("ClientToUpdate Fragment", newClient.toString());
-                wsUpdate = new AsyncUpdateReservationAPI();
+                wsUpdate = new HttpRequestTaskUpdateReservation(newClient);
                 wsUpdate.execute();
             }
         }
-    }
-
-
-    public class AsyncUpdateReservation extends
-            AsyncTask<String, String, String> {
-
-        HttpTransportSE androidHttpTransport;
-        String result = "False";
-
-        @Override
-        protected void onPreExecute() {
-
-            customProgress1.show();
-            super.onPreExecute();
-        }
-
-        protected String doInBackground(String... params) {
-
-            SoapObject request = new SoapObject(NAMESPACE,
-                    METHOD_NAME_UPDATE_RESA);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            //Log.i("Client update alone :", newClient.toString());
-
-            PropertyInfo pi_clientId = new PropertyInfo();
-            pi_clientId.setName("clientId");
-            pi_clientId.setValue(newClient.getClientId());
-            pi_clientId.setType(Integer.class);
-            request.addProperty(pi_clientId);
-
-            PropertyInfo pi_clientNom = new PropertyInfo();
-            pi_clientNom.setName("NomClient");
-            pi_clientNom.setValue(newClient.getClientNom());
-            pi_clientNom.setType(String.class);
-            request.addProperty(pi_clientNom);
-
-            PropertyInfo pi_clientPrenom = new PropertyInfo();
-            pi_clientPrenom.setName("PrenomClient");
-            pi_clientPrenom.setValue(newClient.getClientPrenom());
-            pi_clientPrenom.setType(String.class);
-            request.addProperty(pi_clientPrenom);
-
-            PropertyInfo pi_paysId = new PropertyInfo();
-            pi_paysId.setName("PaysId");
-            pi_paysId.setValue(newClient.getPays());
-            pi_paysId.setType(Integer.class);
-            request.addProperty(pi_paysId);
-
-            PropertyInfo pi_adresse = new PropertyInfo();
-            pi_adresse.setName("clientAdresse");
-            pi_adresse.setValue(newClient.getAdresse());
-            pi_adresse.setType(String.class);
-            request.addProperty(pi_adresse);
-
-            PropertyInfo pi_dateNaiss = new PropertyInfo();
-            pi_dateNaiss.setName("DateNaiss");
-            pi_dateNaiss.setValue(FormatDateyyyyMMdd(newClient.getDateNaiss()));
-            //   //Log.i("Date Naissance", newClient.getDateNaiss());
-            pi_dateNaiss.setType(String.class);
-            request.addProperty(pi_dateNaiss);
-
-            PropertyInfo pi_lieuNaiss = new PropertyInfo();
-            pi_lieuNaiss.setName("LieuNaiss");
-            pi_lieuNaiss.setValue(newClient.getLieuNaiss());
-            pi_lieuNaiss.setType(String.class);
-            request.addProperty(pi_lieuNaiss);
-
-            PropertyInfo pi_sexe = new PropertyInfo();
-            pi_sexe.setName("Sexe");
-            pi_sexe.setValue(newClient.getSexe());
-            pi_sexe.setType(String.class);
-            request.addProperty(pi_sexe);
-
-            PropertyInfo pi_sitFam = new PropertyInfo();
-            pi_sitFam.setName("SitFam");
-            pi_sitFam.setValue(newClient.getSitFam());
-            pi_sitFam.setType(String.class);
-            request.addProperty(pi_sitFam);
-
-            PropertyInfo pi_fumeur = new PropertyInfo();
-            pi_fumeur.setName("Fumeur");
-            pi_fumeur.setValue(newClient.getFumeur());
-            pi_fumeur.setType(Integer.class);
-            request.addProperty(pi_fumeur);
-
-            PropertyInfo pi_handicape = new PropertyInfo();
-            pi_handicape.setName("Handicape");
-            pi_handicape.setValue(newClient.getHandicape());
-            pi_handicape.setType(Integer.class);
-            request.addProperty(pi_handicape);
-
-            PropertyInfo pi_docTypeId = new PropertyInfo();
-            pi_docTypeId.setName("DocTypeId");
-            pi_docTypeId.setValue(newClient.getNatureDocIdentite());
-            pi_docTypeId.setType(Integer.class);
-            request.addProperty(pi_docTypeId);
-
-            PropertyInfo pi_docNum = new PropertyInfo();
-            pi_docNum.setName("DocIdNum");
-            pi_docNum.setValue(newClient.getNumDocIdentite());
-            pi_docNum.setType(String.class);
-            request.addProperty(pi_docNum);
-
-            PropertyInfo pi_email = new PropertyInfo();
-            pi_email.setName("Email");
-            pi_email.setValue(newClient.getEmail());
-            pi_email.setType(String.class);
-            request.addProperty(pi_email);
-
-            PropertyInfo pi_gsm = new PropertyInfo();
-            pi_gsm.setName("Gsm");
-            pi_gsm.setValue(newClient.getGsm());
-            pi_gsm.setType(String.class);
-            request.addProperty(pi_gsm);
-
-            PropertyInfo pi_profession = new PropertyInfo();
-            pi_profession.setName("Profession");
-            pi_profession.setValue(newClient.getProfession());
-            pi_profession.setType(String.class);
-            request.addProperty(pi_profession);
-
-            PropertyInfo pi_city = new PropertyInfo();
-            pi_city.setName("City");
-            pi_city.setValue(newClient.getCity());
-            pi_city.setType(String.class);
-            request.addProperty(pi_city);
-
-            PropertyInfo pi_postal = new PropertyInfo();
-            pi_postal.setName("CodePostal");
-            pi_postal.setValue(newClient.getCodePostal());
-            pi_postal.setType(String.class);
-            request.addProperty(pi_postal);
-
-            PropertyInfo pi_civi = new PropertyInfo();
-            pi_civi.setName("Civilite");
-            pi_civi.setValue(newClient.getCivilite());
-            pi_civi.setType(Integer.class);
-            request.addProperty(pi_civi);
-
-
-            Log.i("Asynck Task Client", newClient.toString());
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(request);
-            androidHttpTransport = new HttpTransportSE(getURL());
-
-            try {
-                try {
-                    androidHttpTransport
-                            .call(SOAP_ACTION_UPDATE_RESA, envelope);
-                    result = envelope.getResponse().toString();
-                    Log.i("Response Update", result.toString());
-                } catch (SocketTimeoutException e) {
-                    getActivity().runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            customProgress1.hide();
-                            ShowErrorConnectionDialog();
-                            androidHttpTransport.reset();
-                        }
-                    });
-
-                }
-                getActivity().runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        ShowSuccesUpdateDialog(Boolean.parseBoolean(result));
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            customProgress1.hide();
-            androidHttpTransport.reset();
-            // //Log.i("Finished", "Update");
-            super.onPostExecute(result);
-        }
-
-    }
-
-    public String getURL() {
-        String URL = null;
-        try {
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity());
-            URL = sp.getString("SERVEUR", "");
-            // //Log.i("URL", URL);
-            URL = "http://" + URL + "/hngwebsetup/webservice/myhotix.asmx";
-            //Log.i("URL", URL);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return URL;
     }
 
     private void ShowSuccesUpdateDialog(Boolean b) {
@@ -1209,7 +990,7 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     private String TAG = OneFragment.class.getSimpleName();
 
-    /**************************************************************************
+    /*
      *
      *
      */
@@ -1300,6 +1081,66 @@ public class OneFragment extends Fragment implements View.OnClickListener {
 
     }
 
+
+    private class HttpRequestTaskUpdateReservation extends AsyncTask<Void, Void, Boolean> {
+        Boolean response = null;
+
+        Client cliToUpdate;
+
+        public HttpRequestTaskUpdateReservation(Client cliToUpdate) {
+            this.cliToUpdate = cliToUpdate;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+
+                // Making a request to url and getting response
+                String url = getURLAPI() + "UpdateReservationInfos";
+                url += "?clientId=" + cliToUpdate.getClientId() +
+                        ((cliToUpdate.getClientNom() != "") ? "&NomClient=" + cliToUpdate.getClientNom() : "") +
+                        ((cliToUpdate.getClientPrenom() != "") ? "&PrenomClient=" + cliToUpdate.getClientPrenom() : "") +
+                        "&PaysId=" + cliToUpdate.getPays() +
+                        "&clientAdresse=" + cliToUpdate.getAdresse() +
+                        "&DateNaiss=" + cliToUpdate.getDateNaiss() +
+                        "&LieuNaiss=" + cliToUpdate.getLieuNaiss() +
+                        "&Sexe=" + cliToUpdate.getSexe() +
+                        "&SitFam=" + cliToUpdate.getSitFam() +
+                        "&Fumeur=" + cliToUpdate.getFumeur() +
+                        "&Handicape=" + cliToUpdate.getHandicape() +
+                        "&DocTypeId=" + cliToUpdate.getNatureDocIdentite() +
+                        "&DocIdNum=" + cliToUpdate.getNumDocIdentite() +
+                        "&Email=" + cliToUpdate.getEmail() +
+                        "&Gsm=" + cliToUpdate.getGsm() +
+                        "&Profession=" + cliToUpdate.getProfession();
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                response = restTemplate.getForObject(url, Boolean.class);
+                Log.i(TAG, "Update Reservation :" + response.toString());
+
+                return response;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean greeting) {
+            customProgress1.hide();
+            ShowSuccesUpdateDialog(response);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            customProgress1.show();
+            //Log.i(TAG, "GET Reservation");
+        }
+    }
 
     public String getURLAPI() {
         String URL = null;

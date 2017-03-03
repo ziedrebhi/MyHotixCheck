@@ -32,13 +32,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,11 +55,8 @@ public class ClientsActivity extends AppCompatActivity {
     private int NbrClient;
     private String refResa;
     ArrayList<Client> clientsUpdate;
-    public final String NAMESPACE = "http://tempuri.org/";
-    public final String SOAP_ACTION_UPDATE_RESA = "http://tempuri.org/UpdateReservationInfos";
-    public final String METHOD_NAME_UPDATE_RESA = "UpdateReservationInfos";
     Client newClient;
-    AsyncUpdateReservationAPI wsUpdateAPI;
+    HttpRequestTaskUpdateReservation wsUpdateAPI;
     int nbrClientToUpdate = 0;
     int nbrClientUpdates = 0;
 
@@ -79,33 +72,24 @@ public class ClientsActivity extends AppCompatActivity {
         NbrClient = getIntent().getIntExtra("NBR_CLIENTS", 1);
         refResa = getIntent().getStringExtra("RESA_REF");
         curClients = getIntent().getParcelableArrayListExtra("CLIENTS");
+        int index = 1;
         for (Client cli : curClients) {
-            Log.i("Clients Activity Client", cli.toString());
+            Log.i("ClientActivity onCreate", "Client " + String.valueOf(index) + " :" + cli.toString());
+            index++;
         }
         listDocTypes = getIntent().getParcelableArrayListExtra("DOCS");
         listPays = getIntent().getParcelableArrayListExtra("PAYS");
-        //Log.i("GET CLIENTS ACTIVITY", curClients.toString());
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setTitle(getResources().getText(R.string.str_resa_ref) + ": " + refResa);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        setTitle(getResources().getText(R.string.str_resa_ref) + ": " + refResa);
-
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(2);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
-
-
-    }
-
-    private String FormatDate(String s) {
-
-        return s.substring(6, 8) + "/" + s.substring(4, 6) + "/"
-                + s.substring(0, 4);
     }
 
     /**
@@ -136,7 +120,7 @@ public class ClientsActivity extends AppCompatActivity {
 
         for (int i = 0; i < NbrClient; i++) {
             adapter.addFrag(new OneFragment().newInstance(curClients.get(i), refResa, listPays, listDocTypes, i + 1), "ONE");
-            Log.i("strList", "ADD FRAGMENT");
+            //Log.i("strList", "ADD FRAGMENT");
 
         }
         viewPager.setAdapter(adapter);
@@ -159,10 +143,10 @@ public class ClientsActivity extends AppCompatActivity {
                 startActivity(i);
                 break;
             case R.id.action_save:
-                ////Log.i("Save", "Save");
+
                 clientsUpdate = new ArrayList<Client>();
 
-
+                Log.i("FRAGMENT", "onOptionsItemSelected");
                 alertDialogBuilder = new AlertDialog.Builder(ClientsActivity.this);
                 alertDialogBuilder.setTitle(getResources().getText(
                         R.string.str_resa_ref) + " " + refResa);
@@ -182,37 +166,37 @@ public class ClientsActivity extends AppCompatActivity {
                                     nbrClientUpdates = 0;
                                     nbrClientToUpdate = 0;
                                     ArrayList<Fragment> listFrag = getAllFragments();
-                                    // //Log.i("FRAGMENTS", String.valueOf(listFrag.size()));
+
                                     for (Fragment frg : listFrag) {
                                         OneFragment frgFicheClient = (OneFragment) frg;
                                         Client cli = frgFicheClient.getDataClient();
                                         if (cli != null)
                                             clientsUpdate.add(cli);
-                                        //Log.i("clientsUpdate", clientsUpdate.toString());
+
                                     }
 
                                     customProgress1 = new ProgressDialog(ClientsActivity.this);
                                     if (listFrag.size() == clientsUpdate.size()) {
                                         nbrClientToUpdate = clientsUpdate.size();
 
-                                        //Log.i("UPDATE ", "TRUE");
+
                                         int i = 0;
                                         for (Client cli : clientsUpdate) {
                                             newClient = cli;
-                                            // //Log.i("ZIED", "UPDATE CLIENT :" + String.valueOf(i + 1));
+
 
                                             customProgress1.setMessage(getResources().getText(
                                                     R.string.msg_saving_resa));
                                             //customProgress1.show();
                                             if (isOnline()) {
 
-                                                wsUpdateAPI = new AsyncUpdateReservationAPI(cli);
+                                                wsUpdateAPI = new HttpRequestTaskUpdateReservation(cli);
                                                 wsUpdateAPI.execute();
                                             }
 
                                         }
                                     } else {
-                                        //Log.i("UPDATE ", "FALSE");
+
                                     }
                                 } else {
                                     Intent intent = new Intent(ClientsActivity.this, CaptureSignature.class);
@@ -357,220 +341,15 @@ public class ClientsActivity extends AppCompatActivity {
 
     }
 
-    public class AsyncUpdateReservationOLD extends
-            AsyncTask<String, String, String> {
-
-        HttpTransportSE androidHttpTransport;
-        String result = "False";
-        Client cliToUpdate;
-
-        public AsyncUpdateReservationOLD(Client cliToUpdate) {
-            this.cliToUpdate = cliToUpdate;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            //  //Log.i("ASYNCK TASK", "onPreExecute");
-
-            customProgress1.show();
-            super.onPreExecute();
-        }
-
-        protected String doInBackground(String... params) {
-            //   //Log.i("ASYNCK TASK", "doInBackground");
-            SoapObject request = new SoapObject(NAMESPACE,
-                    METHOD_NAME_UPDATE_RESA);
-
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            //Log.i("Client to Update Now :", cliToUpdate.toString());
-            PropertyInfo pi_clientId = new PropertyInfo();
-            pi_clientId.setName("clientId");
-            pi_clientId.setValue(cliToUpdate.getClientId());
-            pi_clientId.setType(Integer.class);
-            request.addProperty(pi_clientId);
-
-            PropertyInfo pi_clientNom = new PropertyInfo();
-            pi_clientNom.setName("NomClient");
-            pi_clientNom.setValue(cliToUpdate.getClientNom());
-            pi_clientNom.setType(String.class);
-            request.addProperty(pi_clientNom);
-
-            PropertyInfo pi_clientPrenom = new PropertyInfo();
-            pi_clientPrenom.setName("PrenomClient");
-            pi_clientPrenom.setValue(cliToUpdate.getClientPrenom());
-            pi_clientPrenom.setType(String.class);
-            request.addProperty(pi_clientPrenom);
-
-            PropertyInfo pi_paysId = new PropertyInfo();
-            pi_paysId.setName("PaysId");
-            pi_paysId.setValue(cliToUpdate.getPays());
-            pi_paysId.setType(Integer.class);
-            request.addProperty(pi_paysId);
-
-            PropertyInfo pi_adresse = new PropertyInfo();
-            pi_adresse.setName("clientAdresse");
-            pi_adresse.setValue(cliToUpdate.getAdresse());
-            pi_adresse.setType(String.class);
-            request.addProperty(pi_adresse);
-
-            PropertyInfo pi_dateNaiss = new PropertyInfo();
-            pi_dateNaiss.setName("DateNaiss");
-            pi_dateNaiss.setValue(cliToUpdate.getDateNaiss());
-            //   //Log.i("Date Naissance", newClient.getDateNaiss());
-            pi_dateNaiss.setType(String.class);
-            request.addProperty(pi_dateNaiss);
-
-            PropertyInfo pi_lieuNaiss = new PropertyInfo();
-            pi_lieuNaiss.setName("LieuNaiss");
-            pi_lieuNaiss.setValue(cliToUpdate.getLieuNaiss());
-            pi_lieuNaiss.setType(String.class);
-            request.addProperty(pi_lieuNaiss);
-
-            PropertyInfo pi_sexe = new PropertyInfo();
-            pi_sexe.setName("Sexe");
-            pi_sexe.setValue(cliToUpdate.getSexe());
-            pi_sexe.setType(String.class);
-            request.addProperty(pi_sexe);
-
-            PropertyInfo pi_sitFam = new PropertyInfo();
-            pi_sitFam.setName("SitFam");
-            pi_sitFam.setValue(cliToUpdate.getSitFam());
-            pi_sitFam.setType(String.class);
-            request.addProperty(pi_sitFam);
-
-            PropertyInfo pi_fumeur = new PropertyInfo();
-            pi_fumeur.setName("Fumeur");
-            pi_fumeur.setValue(cliToUpdate.getFumeur());
-            pi_fumeur.setType(Integer.class);
-            request.addProperty(pi_fumeur);
-
-            PropertyInfo pi_handicape = new PropertyInfo();
-            pi_handicape.setName("Handicape");
-            pi_handicape.setValue(cliToUpdate.getHandicape());
-            pi_handicape.setType(Integer.class);
-            request.addProperty(pi_handicape);
-
-            PropertyInfo pi_docTypeId = new PropertyInfo();
-            pi_docTypeId.setName("DocTypeId");
-            pi_docTypeId.setValue(cliToUpdate.getNatureDocIdentite());
-            pi_docTypeId.setType(Integer.class);
-            request.addProperty(pi_docTypeId);
-
-            PropertyInfo pi_docNum = new PropertyInfo();
-            pi_docNum.setName("DocIdNum");
-            pi_docNum.setValue(cliToUpdate.getNumDocIdentite());
-            pi_docNum.setType(String.class);
-            request.addProperty(pi_docNum);
-
-            PropertyInfo pi_email = new PropertyInfo();
-            pi_email.setName("Email");
-            pi_email.setValue(cliToUpdate.getEmail());
-            pi_email.setType(String.class);
-            request.addProperty(pi_email);
-
-            PropertyInfo pi_gsm = new PropertyInfo();
-            pi_gsm.setName("Gsm");
-            pi_gsm.setValue(cliToUpdate.getGsm());
-            pi_gsm.setType(String.class);
-            request.addProperty(pi_gsm);
-
-            PropertyInfo pi_profession = new PropertyInfo();
-            pi_profession.setName("Profession");
-            pi_profession.setValue(cliToUpdate.getProfession());
-            pi_profession.setType(String.class);
-            request.addProperty(pi_profession);
-
-            PropertyInfo pi_city = new PropertyInfo();
-            pi_city.setName("City");
-            pi_city.setValue(cliToUpdate.getCity());
-            pi_city.setType(String.class);
-            request.addProperty(pi_city);
-
-            PropertyInfo pi_postal = new PropertyInfo();
-            pi_postal.setName("CodePostal");
-            pi_postal.setValue(cliToUpdate.getCodePostal());
-            pi_postal.setType(String.class);
-            request.addProperty(pi_postal);
-
-            PropertyInfo pi_civi = new PropertyInfo();
-            pi_civi.setName("Civilite");
-            pi_civi.setValue(cliToUpdate.getCivilite());
-            pi_civi.setType(Integer.class);
-            request.addProperty(pi_civi);
-
-            envelope.dotNet = true;
-            envelope.setOutputSoapObject(request);
-            androidHttpTransport = new HttpTransportSE(getURL());
-
-            try {
-                try {
-                    androidHttpTransport
-                            .call(SOAP_ACTION_UPDATE_RESA, envelope);
-                    result = envelope.getResponse().toString();
-                } catch (SocketTimeoutException e) {
-                    runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            customProgress1.hide();
-                            ShowErrorConnectionDialog();
-                            androidHttpTransport.reset();
-                        }
-                    });
-
-                }
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        nbrClientUpdates++;
-                        if (nbrClientToUpdate == nbrClientUpdates) {
-                            customProgress1.hide();
-                            ShowSuccesUpdateDialog(Boolean.parseBoolean(result));
-
-
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        customProgress1.hide();
-                        ShowErrorConnectionDialog();
-                        androidHttpTransport.reset();
-                    }
-                });
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            //  nbrClientUpdates++;
-            customProgress1.hide();
-            androidHttpTransport.reset();
-            // //Log.i("Finished", "onPostExecute " + String.valueOf(nbrClientUpdates));
-            super.onPostExecute(result);
-        }
-
-    }
-
     public String getURL() {
         String URL = null;
         try {
             SharedPreferences sp = PreferenceManager
                     .getDefaultSharedPreferences(this);
             URL = sp.getString("SERVEUR", "");
-            // //Log.i("URL", URL);
+
             URL = "http://" + URL + "/hngwebsetup/webservice/myhotix.asmx";
-            //Log.i("URL", URL);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -647,37 +426,36 @@ public class ClientsActivity extends AppCompatActivity {
                         nbrClientUpdates = 0;
                         nbrClientToUpdate = 0;
                         ArrayList<Fragment> listFrag = getAllFragments();
-                        // //Log.i("FRAGMENTS", String.valueOf(listFrag.size()));
+
                         for (Fragment frg : listFrag) {
                             OneFragment frgFicheClient = (OneFragment) frg;
                             Client cli = frgFicheClient.getDataClient();
                             if (cli != null)
                                 clientsUpdate.add(cli);
-                            //Log.i("clientsUpdate", clientsUpdate.toString());
+
                         }
 
                         customProgress1 = new ProgressDialog(ClientsActivity.this);
                         if (listFrag.size() == clientsUpdate.size()) {
                             nbrClientToUpdate = clientsUpdate.size();
 
-                            //Log.i("UPDATE ", "TRUE");
+
                             int i = 0;
                             for (Client cli : clientsUpdate) {
                                 newClient = cli;
-                                // //Log.i("ZIED", "UPDATE CLIENT :" + String.valueOf(i + 1));
 
                                 customProgress1.setMessage(getResources().getText(
                                         R.string.msg_saving_resa));
                                 //customProgress1.show();
                                 if (isOnline()) {
 
-                                    wsUpdateAPI = new AsyncUpdateReservationAPI(cli);
+                                    wsUpdateAPI = new HttpRequestTaskUpdateReservation(cli);
                                     wsUpdateAPI.execute();
                                 }
 
                             }
                         } else {
-                            //Log.i("UPDATE ", "FALSE");
+
                         }
                     }
                 }
@@ -686,13 +464,7 @@ public class ClientsActivity extends AppCompatActivity {
 
     }
 
-
     private String TAG = ClientsActivity.class.getSimpleName();
-
-    /**************************************************************************
-     *
-     *
-     */
 
     public class AsyncUpdateReservationAPI extends
             AsyncTask<String, String, String> {
@@ -707,7 +479,6 @@ public class ClientsActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            //  //Log.i("ASYNCK TASK", "onPreExecute");
 
             customProgress1.show();
             super.onPreExecute();
@@ -733,7 +504,7 @@ public class ClientsActivity extends AppCompatActivity {
                     "&Email=" + cliToUpdate.getEmail() +
                     "&Gsm=" + cliToUpdate.getGsm() +
                     "&Profession=" + cliToUpdate.getProfession();
-            String jsonStr = sh.makeServiceCall(url);
+            final String jsonStr = sh.makeServiceCall(url);
             Log.e(TAG, " url: " + url);
 
             Log.e(TAG, "Response from url: " + jsonStr);
@@ -745,9 +516,10 @@ public class ClientsActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.e(TAG, "ZIED " + String.valueOf(Boolean.parseBoolean(jsonStr)));
 
                         customProgress1.hide();
-                        ShowSuccesUpdateDialog(Boolean.parseBoolean(result));
+                        ShowSuccesUpdateDialog(Boolean.parseBoolean(jsonStr));
 
                     }
                 });
@@ -767,51 +539,7 @@ public class ClientsActivity extends AppCompatActivity {
             }
 
             return null;
-/*
-            try {
-                try {
-                    androidHttpTransport
-                            .call(SOAP_ACTION_UPDATE_RESA, envelope);
-                    result = envelope.getResponse().toString();
-                } catch (SocketTimeoutException e) {
-                    runOnUiThread(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            customProgress1.hide();
-                            ShowErrorConnectionDialog();
-                            androidHttpTransport.reset();
-                        }
-                    });
-
-                }
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        nbrClientUpdates++;
-                        if (nbrClientToUpdate == nbrClientUpdates) {
-                            customProgress1.hide();
-                            ShowSuccesUpdateDialog(Boolean.parseBoolean(result));
-
-
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        customProgress1.hide();
-                        ShowErrorConnectionDialog();
-                        androidHttpTransport.reset();
-                    }
-                });
-            }
-
-            return null;*/
         }
 
         @Override
@@ -823,7 +551,6 @@ public class ClientsActivity extends AppCompatActivity {
         }
 
     }
-
 
     public String getURLAPI() {
         String URL = null;
@@ -838,6 +565,67 @@ public class ClientsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return URL;
+    }
+
+
+    private class HttpRequestTaskUpdateReservation extends AsyncTask<Void, Void, Boolean> {
+        Boolean response = null;
+
+        Client cliToUpdate;
+
+        public HttpRequestTaskUpdateReservation(Client cliToUpdate) {
+            this.cliToUpdate = cliToUpdate;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+
+                // Making a request to url and getting response
+                String url = getURLAPI() + "UpdateReservationInfos";
+                url += "?clientId=" + cliToUpdate.getClientId() +
+                        ((cliToUpdate.getClientNom() != "") ? "&NomClient=" + cliToUpdate.getClientNom() : "") +
+                        ((cliToUpdate.getClientPrenom() != "") ? "&PrenomClient=" + cliToUpdate.getClientPrenom() : "") +
+                        "&PaysId=" + cliToUpdate.getPays() +
+                        "&clientAdresse=" + cliToUpdate.getAdresse() +
+                        "&DateNaiss=" + cliToUpdate.getDateNaiss() +
+                        "&LieuNaiss=" + cliToUpdate.getLieuNaiss() +
+                        "&Sexe=" + cliToUpdate.getSexe() +
+                        "&SitFam=" + cliToUpdate.getSitFam() +
+                        "&Fumeur=" + cliToUpdate.getFumeur() +
+                        "&Handicape=" + cliToUpdate.getHandicape() +
+                        "&DocTypeId=" + cliToUpdate.getNatureDocIdentite() +
+                        "&DocIdNum=" + cliToUpdate.getNumDocIdentite() +
+                        "&Email=" + cliToUpdate.getEmail() +
+                        "&Gsm=" + cliToUpdate.getGsm() +
+                        "&Profession=" + cliToUpdate.getProfession();
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                response = restTemplate.getForObject(url, Boolean.class);
+                Log.i(TAG, "Update Reservation :" + response.toString());
+
+                return response;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean greeting) {
+            customProgress1.hide();
+            ShowSuccesUpdateDialog(response);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            customProgress1.show();
+            //Log.i(TAG, "GET Reservation");
+        }
     }
 
 }

@@ -4,10 +4,6 @@ package hotix.myhotix.checkin.activity;
  * Created by ziedrebhi_2 on 08/09/2016.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Calendar;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -23,7 +19,6 @@ import android.os.Environment;
 import android.provider.MediaStore.Images;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,6 +28,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Calendar;
 
 import hotix.myhotix.checkin.R;
 
@@ -144,9 +143,10 @@ public class CaptureSignature extends Activity {
         }
 
         if(error){
-            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+           /* Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.TOP, 105, 50);
-            toast.show();
+            toast.show();*/
+            yourName.setError(errorMessage);
         }
 
         return error;
@@ -188,7 +188,8 @@ public class CaptureSignature extends Activity {
         } catch (Exception e)
         {
             e.printStackTrace();
-            Toast.makeText(this, "Could not initiate File System.. Is Sdcard mounted properly?", 1000).show();
+            Toast.makeText(this, "Could not initiate File System.. Is Sdcard mounted properly?",
+                    Toast.LENGTH_LONG).show();
             return false;
         }
     }

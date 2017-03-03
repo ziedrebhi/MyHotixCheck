@@ -927,6 +927,7 @@
                 android:background="@drawable/custom_btn_beige"
                 android:text="@string/str_update_client"
                 android:textColor="@drawable/custom_btn_color_text"
+                android:visibility="gone"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
