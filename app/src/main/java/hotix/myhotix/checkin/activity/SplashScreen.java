@@ -1,6 +1,5 @@
 package hotix.myhotix.checkin.activity;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,7 +33,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -53,27 +51,15 @@ import hotix.myhotix.checkin.utilities.UpdateChecker;
 public class SplashScreen extends AppCompatActivity {
 
     // ************ Paramètres Web Services ************
-    public final String NAMESPACE = "http://tempuri.org/";
 
-    public final String SOAP_ACTION_PAYS = "http://tempuri.org/GetAllPays";
-    public final String METHOD_NAME_PAYS = "GetAllPays";
-
-    public final String SOAP_ACTION_PIECE_IDENDITE = "http://tempuri.org/GetAllPiecesIdendite";
-    public final String METHOD_NAME_PIECE_IDENDITE = "GetAllPiecesIdendite";
-
-    public final String SOAP_ACTION_GET_RESA = "http://tempuri.org/GetReservation";
-    public final String METHOD_NAME_GET_RESA = "GetReservation";
-
-    static int y1, m1, d1;
-    private final int REQ_CODE_SPEECH_INPUT = 100;
     ProgressDialog customProgress1;
-    AlertDialog.Builder alertDialogBuilder;
+
     SharedPreferences pref;
     TextView version;
     EditText editSearch;
     String refResa;
+
     ArrayList<Client> curClients;
-    Boolean exception = false;
     ArrayList<ItemSpinner> listPays;
     ArrayList<String> pays;
     ArrayList<ItemSpinner> listDocTypes;
@@ -181,7 +167,7 @@ public class SplashScreen extends AppCompatActivity {
 
             Intent i = new Intent(SplashScreen.this, IPServeur.class);
             startActivity(i);
-
+            finish();
         }
 
 
@@ -346,7 +332,7 @@ public class SplashScreen extends AppCompatActivity {
         boolean lastVersion = true;
         String serveur = (pref.getString("SERVEUR", ""));
         if (!serveur.equals("")) {
-            checker.checkForUpdateByVersionCode("http://" + serveur + "/Android/version.txt");
+            checker.checkForUpdateByVersionCode("http://" + serveur + "/Android/versionCheck.txt");
 
             if (checker.isUpdateAvailable()) {
                 Log.i("Update", "True");
@@ -361,7 +347,7 @@ public class SplashScreen extends AppCompatActivity {
         String serveur = (pref.getString("SERVEUR", ""));
         if (!serveur.equals("")) {
 
-            checker.downloadAndInstall("http://" + serveur + "/Android/app.apk");
+            checker.downloadAndInstall("http://" + serveur + "/Android/appCheck.apk");
         }
     }
 
@@ -463,21 +449,6 @@ public class SplashScreen extends AppCompatActivity {
     }
 
 
-    public String getURL() {
-        String URL = null;
-        try {
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-            URL = sp.getString("SERVEUR", "");
-
-            URL = "http://" + URL + "/hngwebsetup/webservice/myhotix.asmx";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return URL;
-    }
-
     private void ShowSnakeBarInfo(int i) {
 
         Snackbar snackbar;
@@ -552,7 +523,6 @@ public class SplashScreen extends AppCompatActivity {
     /******************************************************************/
 
     private String TAG = SplashScreen.class.getSimpleName();
-    private ListView lv;
 
     /*****************************************************************/
 
@@ -716,6 +686,7 @@ public class SplashScreen extends AppCompatActivity {
                     curClient.setPays(r.getPaysId());
                     curClient.setAdresse(r.getAddresse());
                     curClient.setDateNaiss(r.getDateNaissance());
+                    curClient.setEmail(r.getEmail());
                     //Log.i("DebugZied", curClient.getDateNaiss());
                     curClient.setLieuNaiss(r.getLieu());
                     curClient.setSexe(r.getSexe());
@@ -745,7 +716,7 @@ public class SplashScreen extends AppCompatActivity {
                 if (!response.isStatus()) {
                     ShowSnakeBarInfo(2);
                 } else {
-                    ShowSnakeBarInfo(1);
+                    ShowSnakeBarInfo(0);
                 }
 
             }

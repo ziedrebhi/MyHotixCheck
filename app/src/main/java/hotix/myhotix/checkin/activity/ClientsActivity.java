@@ -30,17 +30,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import hotix.myhotix.checkin.R;
 import hotix.myhotix.checkin.fragments.OneFragment;
-import hotix.myhotix.checkin.utilities.HttpHandler;
 
 public class ClientsActivity extends AppCompatActivity {
 
@@ -341,20 +341,6 @@ public class ClientsActivity extends AppCompatActivity {
 
     }
 
-    public String getURL() {
-        String URL = null;
-        try {
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-            URL = sp.getString("SERVEUR", "");
-
-            URL = "http://" + URL + "/hngwebsetup/webservice/myhotix.asmx";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return URL;
-    }
 
     private void ShowSuccesUpdateDialog(Boolean b) {
 
@@ -418,6 +404,7 @@ public class ClientsActivity extends AppCompatActivity {
                     Bundle bundle = data.getExtras();
                     String status = bundle.getString("status");
                     String uniqueId = bundle.getString("uniqueid");
+                    String image = bundle.getString("image");
                     if (status.equalsIgnoreCase("done")) {
                     /*    Toast toast = Toast.makeText(this, "Signature capture successful!", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.TOP, 105, 50);
@@ -430,6 +417,7 @@ public class ClientsActivity extends AppCompatActivity {
                         for (Fragment frg : listFrag) {
                             OneFragment frgFicheClient = (OneFragment) frg;
                             Client cli = frgFicheClient.getDataClient();
+                            cli.setImage(image);
                             if (cli != null)
                                 clientsUpdate.add(cli);
 
@@ -443,7 +431,7 @@ public class ClientsActivity extends AppCompatActivity {
                             int i = 0;
                             for (Client cli : clientsUpdate) {
                                 newClient = cli;
-
+                                Log.i("Update zr", newClient.toString());
                                 customProgress1.setMessage(getResources().getText(
                                         R.string.msg_saving_resa));
                                 //customProgress1.show();
@@ -466,92 +454,6 @@ public class ClientsActivity extends AppCompatActivity {
 
     private String TAG = ClientsActivity.class.getSimpleName();
 
-    public class AsyncUpdateReservationAPI extends
-            AsyncTask<String, String, String> {
-
-
-        String result = "False";
-        Client cliToUpdate;
-
-        public AsyncUpdateReservationAPI(Client cliToUpdate) {
-            this.cliToUpdate = cliToUpdate;
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            customProgress1.show();
-            super.onPreExecute();
-        }
-
-        protected String doInBackground(String... params) {
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            String url = getURLAPI() + "UpdateReservationInfos";
-            url += "?clientId=" + cliToUpdate.getClientId() +
-                    ((cliToUpdate.getClientNom() != "") ? "&NomClient=" + cliToUpdate.getClientNom() : "") +
-                    ((cliToUpdate.getClientPrenom() != "") ? "&PrenomClient=" + cliToUpdate.getClientPrenom() : "") +
-                    "&PaysId=" + cliToUpdate.getPays() +
-                    "&clientAdresse=" + cliToUpdate.getAdresse() +
-                    "&DateNaiss=" + cliToUpdate.getDateNaiss() +
-                    "&LieuNaiss=" + cliToUpdate.getLieuNaiss() +
-                    "&Sexe=" + cliToUpdate.getSexe() +
-                    "&SitFam=" + cliToUpdate.getSitFam() +
-                    "&Fumeur=" + cliToUpdate.getFumeur() +
-                    "&Handicape=" + cliToUpdate.getHandicape() +
-                    "&DocTypeId=" + cliToUpdate.getNatureDocIdentite() +
-                    "&DocIdNum=" + cliToUpdate.getNumDocIdentite() +
-                    "&Email=" + cliToUpdate.getEmail() +
-                    "&Gsm=" + cliToUpdate.getGsm() +
-                    "&Profession=" + cliToUpdate.getProfession();
-            final String jsonStr = sh.makeServiceCall(url);
-            Log.e(TAG, " url: " + url);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-
-
-            if (jsonStr != null) {
-
-                result = jsonStr;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e(TAG, "ZIED " + String.valueOf(Boolean.parseBoolean(jsonStr)));
-
-                        customProgress1.hide();
-                        ShowSuccesUpdateDialog(Boolean.parseBoolean(jsonStr));
-
-                    }
-                });
-
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                        customProgress1.hide();
-                        ShowErrorConnectionDialog();
-                    }
-                });
-            }
-
-            return null;
-
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            //  nbrClientUpdates++;
-            customProgress1.hide();
-            super.onPostExecute(result);
-        }
-
-    }
-
     public String getURLAPI() {
         String URL = null;
         try {
@@ -559,7 +461,7 @@ public class ClientsActivity extends AppCompatActivity {
                     .getDefaultSharedPreferences(this);
             URL = sp.getString("SERVEUR", "192.168.0.100");
 
-            URL = "http://" + URL + "/HNGAPI/api/apiPreCheckIn/";
+            URL = "http://" + URL;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -582,7 +484,7 @@ public class ClientsActivity extends AppCompatActivity {
             try {
 
                 // Making a request to url and getting response
-                String url = getURLAPI() + "UpdateReservationInfos";
+             /*   String url = getURLAPI() + "/HNGAPI/api/apiPreCheckIn/UpdateReservationInfos";
                 url += "?clientId=" + cliToUpdate.getClientId() +
                         ((cliToUpdate.getClientNom() != "") ? "&NomClient=" + cliToUpdate.getClientNom() : "") +
                         ((cliToUpdate.getClientPrenom() != "") ? "&PrenomClient=" + cliToUpdate.getClientPrenom() : "") +
@@ -598,10 +500,32 @@ public class ClientsActivity extends AppCompatActivity {
                         "&DocIdNum=" + cliToUpdate.getNumDocIdentite() +
                         "&Email=" + cliToUpdate.getEmail() +
                         "&Gsm=" + cliToUpdate.getGsm() +
-                        "&Profession=" + cliToUpdate.getProfession();
+                        "&Profession=" + cliToUpdate.getProfession() +
+                        "&Image=" + cliToUpdate.getImage();*/
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                response = restTemplate.getForObject(url, Boolean.class);
+                URI targetUrl = UriComponentsBuilder.fromUriString(getURLAPI())
+                        .path("/HNGAPI/api/apiPreCheckIn/UpdateReservationInfos")
+                        .queryParam("clientId", cliToUpdate.getClientId())
+                        .queryParam("NomClient", cliToUpdate.getClientNom())
+                        .queryParam("PrenomClient", cliToUpdate.getClientPrenom())
+                        .queryParam("PaysId", cliToUpdate.getPays())
+                        .queryParam("clientAdresse", cliToUpdate.getAdresse())
+                        .queryParam("DateNaiss", cliToUpdate.getDateNaiss())
+                        .queryParam("LieuNaiss", cliToUpdate.getLieuNaiss())
+                        .queryParam("Sexe", cliToUpdate.getSexe())
+                        .queryParam("SitFam", cliToUpdate.getSitFam())
+                        .queryParam("Fumeur", cliToUpdate.getFumeur())
+                        .queryParam("Handicape", cliToUpdate.getHandicape())
+                        .queryParam("DocTypeId", cliToUpdate.getNatureDocIdentite())
+                        .queryParam("DocIdNum", cliToUpdate.getNumDocIdentite())
+                        .queryParam("Email", cliToUpdate.getEmail())
+                        .queryParam("Gsm", cliToUpdate.getGsm())
+                        .queryParam("Profession", cliToUpdate.getProfession())
+                        .queryParam("Image", cliToUpdate.getImage())
+                        .build()
+                        .toUri();
+                response = restTemplate.getForObject(targetUrl, Boolean.class);
                 Log.i(TAG, "Update Reservation :" + response.toString());
 
                 return response;

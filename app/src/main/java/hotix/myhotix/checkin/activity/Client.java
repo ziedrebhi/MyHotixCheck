@@ -25,6 +25,7 @@ public class Client implements Parcelable {
     String Profession; //
     String City; //
     String CodePostal;
+    String Image;
 
     public static final Creator<Client> CREATOR = new Creator<Client>() {
         @Override
@@ -45,6 +46,14 @@ public class Client implements Parcelable {
 
     public Client() {
 
+    }
+
+    public String getImage() {
+        return Image;
+    }
+
+    public void setImage(String image) {
+        Image = image;
     }
 
     public int getCivilite() {
@@ -75,6 +84,7 @@ public class Client implements Parcelable {
         Profession = in.readString();
         City = in.readString();
         CodePostal = in.readString();
+        Image = in.readString();
     }
 
     @Override
@@ -99,6 +109,7 @@ public class Client implements Parcelable {
                 ", Profession='" + Profession + '\'' +
                 ", City='" + City + '\'' +
                 ", CodePostal='" + CodePostal + '\'' +
+                ", Image='" + Image + '\'' +
                 '}';
     }
 
@@ -123,9 +134,8 @@ public class Client implements Parcelable {
         dest.writeString(Profession);
         dest.writeString(City);
         dest.writeString(CodePostal);
+        dest.writeString(Image);
     }
-
-
 
 
     public int getClientId() {
