@@ -11,8 +11,8 @@ android {
         applicationId 'hotix.myhotix.checkin'
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 5
-        versionName '2.0.0'
+        versionCode 7
+        versionName '3.0.0'
     }
     buildTypes {
         release {
@@ -40,4 +40,6 @@ dependencies {
     compile 'com.github.michaelye.easydialog:easydialog:1.4'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
+    compile 'com.github.gcacace:signature-pad:1.2.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 }

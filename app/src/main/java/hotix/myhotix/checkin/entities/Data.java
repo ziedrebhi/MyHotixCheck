@@ -1,8 +1,9 @@
 package hotix.myhotix.checkin.entities;
 
 /**
- * Created by ziedrebhi on 02/03/2017.
+ * Created by ziedrebhi on 28/03/2017.
  */
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,69 +13,70 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "data",
-        "status"
+        "Pays",
+        "PiecesId"
 })
-public class ResponsePieceIdentite implements Serializable
+public class Data implements Serializable
 {
 
-    @JsonProperty("data")
-    private Data data;
-    @JsonProperty("status")
-    private boolean status;
+    @JsonProperty("Pays")
+    private List<Pay> pays = null;
+    @JsonProperty("PiecesId")
+    private List<PiecesId> piecesId = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    private final static long serialVersionUID = -13611335238040457L;
+    private final static long serialVersionUID = 1979653849121723373L;
 
     /**
      * No args constructor for use in serialization
      *
      */
-    public ResponsePieceIdentite() {
+    public Data() {
     }
 
     /**
      *
-     * @param status
-     * @param data
+     * @param pays
+     * @param piecesId
      */
-    public ResponsePieceIdentite(Data data, boolean status) {
+    public Data(List<Pay> pays, List<PiecesId> piecesId) {
         super();
-        this.data = data;
-        this.status = status;
+        this.pays = pays;
+        this.piecesId = piecesId;
     }
 
-    @JsonProperty("data")
-    public Data getData() {
-        return data;
+    @JsonProperty("Pays")
+    public List<Pay> getPays() {
+        return pays;
     }
 
-    @JsonProperty("data")
-    public void setData(Data data) {
-        this.data = data;
+    @JsonProperty("Pays")
+    public void setPays(List<Pay> pays) {
+        this.pays = pays;
     }
 
-    public ResponsePieceIdentite withData(Data data) {
-        this.data = data;
+    public Data withPays(List<Pay> pays) {
+        this.pays = pays;
         return this;
     }
 
-    @JsonProperty("status")
-    public boolean isStatus() {
-        return status;
+    @JsonProperty("PiecesId")
+    public List<PiecesId> getPiecesId() {
+        return piecesId;
     }
 
-    @JsonProperty("status")
-    public void setStatus(boolean status) {
-        this.status = status;
+    @JsonProperty("PiecesId")
+    public void setPiecesId(List<PiecesId> piecesId) {
+        this.piecesId = piecesId;
     }
 
-    public ResponsePieceIdentite withStatus(boolean status) {
-        this.status = status;
+    public Data withPiecesId(List<PiecesId> piecesId) {
+        this.piecesId = piecesId;
         return this;
     }
 
@@ -88,7 +90,7 @@ public class ResponsePieceIdentite implements Serializable
         this.additionalProperties.put(name, value);
     }
 
-    public ResponsePieceIdentite withAdditionalProperty(String name, Object value) {
+    public Data withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }

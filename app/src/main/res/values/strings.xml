@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyHotixCheck</string>
+    <string name="app_name">MyHotix Check</string>
 
     <string name="action_settings">Paramètres</string>
     <string name="speech_prompt">Resa ref </string>
@@ -91,7 +91,7 @@
     <string name="msg_exception">Problème du Serveur</string>
     <string name="apk_file">MY HOTIX CHECK IN.apk</string>
     <string name="retry">Réessayer</string>
-    <string name="hotix">Hotix ©\nVersion : </string>
+    <string name="hotix">Version : </string>
     <string name="msg_connected">Vous êtes connectés</string>
     <string name="show_date_naissance">Date Naissance</string>
     <string name="show_fumeur">Fumeur</string>

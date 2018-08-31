@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyHotixCheck</string>
+    <string name="app_name">MyHotix Check</string>
 
     <string name="action_settings">Paramètres</string>
     <string name="speech_prompt">Resa ref </string>
@@ -58,13 +58,13 @@
 
     <string name="msg_succes_update">Mise à jour effectuée avec succès</string>
     <string name="msg_echec_update">Echec de mise à jour. \nVeulliez réessayer s\'il vous plait !</string>
-    <string name="msg_pas_de_donnees_client">Pas de client pour cette référence de réservation</string>
+    <string name="msg_pas_de_donnees_client">Pas de clients pour cette référence de réservation</string>
     <string name="champs_requis">Champ requis !</string>
     <string name="msg_mail_invalide">E-mail invalide !</string>
     <string name="msg_exception">Problème du Serveur</string>
     <string name="apk_file">MY HOTIX CHECK IN.apk</string>
     <string name="retry">Réessayer</string>
-    <string name="hotix">Hotix ©\nVersion : </string>
+    <string name="hotix">Version : </string>
     <string name="msg_connected">Vous êtes connectés</string>
     <string name="show_date_naissance">Date Naissance</string>
     <string name="show_fumeur">Fumeur</string>
@@ -123,5 +123,8 @@
     <string name="yourname">Votre nom</string>
     <string name="plzyourname">S\'il vous plaît  entrez votre nom</string>
     <string name="signature">Signer ci-dessous ..</string>
+    <string name="msg_loading">Chargement ...</string>
+    <string name="msg_connecting">Connexion ...</string>
+    <string name="msg_connecting_error_srv">Erreur de connexion au Serveur !</string>
 </resources>
 

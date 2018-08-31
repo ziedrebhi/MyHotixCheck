@@ -2,9 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/serveur">
         <EditTextPreference
-            android:defaultValue="41.228.14.111"
+            android:defaultValue="10.10.1.102"
             android:key="SERVEUR"
-            android:summary="41.228.14.111"
+            android:summary="10.10.1.102"
             android:title="IP serveur"></EditTextPreference>
         <hotix.myhotix.checkin.utilities.Pref
             android:defaultValue="true"
@@ -14,7 +14,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/hotel">
         <EditTextPreference
-            android:defaultValue=""
+            android:defaultValue="1865"
             android:key="HOTEL"
             android:summary="@string/code_hotel"
             android:title="@string/code_hotel"></EditTextPreference>
@@ -109,12 +109,12 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/options">
         <hotix.myhotix.checkin.utilities.Pref
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="ANIMATION"
             android:summary="@string/animation"
             android:title="@string/animation"></hotix.myhotix.checkin.utilities.Pref>
         <hotix.myhotix.checkin.utilities.Pref
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="SHOWCLIENTS"
             android:summary="@string/showcli"
             android:title="@string/showcli"></hotix.myhotix.checkin.utilities.Pref>

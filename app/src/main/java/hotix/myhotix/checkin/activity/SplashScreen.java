@@ -8,8 +8,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -35,14 +36,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import hotix.myhotix.checkin.R;
-import hotix.myhotix.checkin.entities.PieceIdentite;
+import hotix.myhotix.checkin.entities.Pay;
+import hotix.myhotix.checkin.entities.PiecesId;
 import hotix.myhotix.checkin.entities.Resa;
 import hotix.myhotix.checkin.entities.ResponsePieceIdentite;
 import hotix.myhotix.checkin.entities.ResponseResa;
@@ -66,7 +74,7 @@ public class SplashScreen extends AppCompatActivity {
     ArrayList<String> docTypes;
 
     HttpRequestTaskPays wsPaysApi;
-    HttpRequestTaskIdentite wsPIApi;
+    //HttpRequestTaskIdentite wsPIApi;
     private CoordinatorLayout coordinatorLayout;
     private Toolbar toolbar;
     ImageView background;
@@ -80,6 +88,7 @@ public class SplashScreen extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id
                 .LinearLayout1);
 
@@ -87,7 +96,7 @@ public class SplashScreen extends AppCompatActivity {
         editSearch = (EditText) findViewById(R.id.inputSearch);
         background = (ImageView) findViewById(R.id.companyIcon3);
 
-
+        version.setVisibility(View.GONE);
         customProgress1 = new ProgressDialog(SplashScreen.this);
         curClients = new ArrayList<Client>();
         setTitle("Check In");
@@ -171,11 +180,35 @@ public class SplashScreen extends AppCompatActivity {
         }
 
 
+        if (!serveur.equals("")) {
+            serveur = serveur.split("/")[0];
+
+            Bitmap myImage = getBitmapFromURL("http://" + serveur + "/Android/backgroundCheck.jpg");
+            Log.i("BackGround",(myImage!=null)?"ok":"NO");
+            //BitmapDrawable(obj) convert Bitmap object into drawable object.
+            if(myImage!=null) {
+
+                background.setImageBitmap(myImage);
+            }
+        }
         checker = new UpdateChecker(this, true);
 
     }
 
-
+    public Bitmap getBitmapFromURL(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -241,6 +274,13 @@ public class SplashScreen extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem registrar = menu.findItem(R.id.help);
+        registrar.setVisible(false);
         return true;
     }
 
@@ -332,6 +372,7 @@ public class SplashScreen extends AppCompatActivity {
         boolean lastVersion = true;
         String serveur = (pref.getString("SERVEUR", ""));
         if (!serveur.equals("")) {
+            serveur = serveur.split("/")[0];
             checker.checkForUpdateByVersionCode("http://" + serveur + "/Android/versionCheck.txt");
 
             if (checker.isUpdateAvailable()) {
@@ -346,7 +387,7 @@ public class SplashScreen extends AppCompatActivity {
     public void DownloadAndInstallLastVersion() {
         String serveur = (pref.getString("SERVEUR", ""));
         if (!serveur.equals("")) {
-
+            serveur = serveur.split("/")[0];
             checker.downloadAndInstall("http://" + serveur + "/Android/appCheck.apk");
         }
     }
@@ -357,7 +398,7 @@ public class SplashScreen extends AppCompatActivity {
 
         super.onResume();
         wsPaysApi = new HttpRequestTaskPays();
-        wsPIApi = new HttpRequestTaskIdentite();
+        // wsPIApi = new HttpRequestTaskIdentite();
         pref = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
 
@@ -366,7 +407,7 @@ public class SplashScreen extends AppCompatActivity {
         switch (codeHotel) {
             case "1866":
                 // Badira
-                if (pref.getBoolean("ANIMATION", true)) {
+              /*  if (pref.getBoolean("ANIMATION", true)) {
 
                     AnimationDrawable animation = new AnimationDrawable();
                     animation.addFrame(getResources().getDrawable(R.drawable.reception), 5000);
@@ -383,10 +424,31 @@ public class SplashScreen extends AppCompatActivity {
                 } else {
 
                     background.setImageResource(R.drawable.reception);
-                }
+                }*/
+                break;
+            case "1865":
+                // Sultan
+             /*   if (pref.getBoolean("ANIMATION", true)) {
+
+                    AnimationDrawable animation = new AnimationDrawable();
+                    animation.addFrame(getResources().getDrawable(R.drawable.sultan1), 5000);
+                    animation.addFrame(getResources().getDrawable(R.drawable.sultan2), 5000);
+                    animation.setOneShot(false);
+
+
+                    background.setImageDrawable(animation);
+
+                    // start the animation!
+                    animation.start();
+                } else {
+
+                    //background.setImageResource(R.drawable.sultan1);
+                }*/
+                break;
+            case "1701":
+                background.setImageResource(R.drawable.royal);
                 break;
             default:
-                background.setImageResource(R.drawable.hotel);
                 break;
         }
 
@@ -431,9 +493,9 @@ public class SplashScreen extends AppCompatActivity {
     }
 
     private void getDataPaysIden() {
-        String serveur = (pref.getString("SERVEUR", "192.168.0.72"));
+        String serveur = (pref.getString("SERVEUR", ""));
         if (!serveur.equals("")) {
-
+            serveur = serveur.split("/")[0];
             if (isOnline()) {
                 if (((listDocTypes != null) && (listDocTypes.size() == 0)) || ((listPays != null) && (listPays.size() == 0)))
                     wsPaysApi.execute();
@@ -510,7 +572,7 @@ public class SplashScreen extends AppCompatActivity {
                 //Log.i("Asynck Pays", wsPaysApi.getStatus().toString());
                 wsPaysApi = null;
                 wsPaysApi = new HttpRequestTaskPays();
-                wsPIApi = new HttpRequestTaskIdentite();
+                //  wsPIApi = new HttpRequestTaskIdentite();
 
                 RetryGetData();
                 //Log.i("Asynck Pays2", wsPaysApi.getStatus().toString());
@@ -540,11 +602,12 @@ public class SplashScreen extends AppCompatActivity {
             try {
                 final String url = getURLAPI() + "GetAllPays";
                 RestTemplate restTemplate = new RestTemplate();
+                restTemplate.setErrorHandler(new MyErrorHandler());
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 response = restTemplate.getForObject(url, ResponsePieceIdentite.class);
                 //Log.i(TAG, "Pays :" + response.toString());
-                Log.i(TAG, "Pays :" + String.valueOf(response.isStatus()));
-                Log.i(TAG, "Pays :" + String.valueOf(response.getData().size()));
+                Log.i(TAG, "Data :" + String.valueOf(response.isStatus()));
+
                 return response;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -555,26 +618,40 @@ public class SplashScreen extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ResponsePieceIdentite greeting) {
-            if (response.isStatus() && (response.getData().size() != 0)) {
+            if (response != null) {
+                if (response.isStatus()) {
 
-                // put data into listPays
-                listPays = new ArrayList<>();
-                List<PieceIdentite> dataPays = response.getData();
-                for (PieceIdentite _pays :
-                        dataPays) {
-                    ItemSpinner item = new ItemSpinner();
-                    item.setId(_pays.getId());
-                    item.setLabel(_pays.getName());
-                    item.setTel(_pays.getCode());
-                    listPays.add(item);
+
+                    listPays = new ArrayList<>();
+                    listDocTypes = new ArrayList<>();
+
+                    List<Pay> dataPays = response.getData().getPays();
+                    for (Pay _pays :
+                            dataPays) {
+                        ItemSpinner item = new ItemSpinner();
+                        item.setId(_pays.getId());
+                        item.setLabel(_pays.getName());
+                        item.setTel(_pays.getCode());
+                        listPays.add(item);
+                    }
+                    List<PiecesId> dataId = response.getData().getPiecesId();
+                    for (PiecesId _pays :
+                            dataId) {
+                        ItemSpinner item = new ItemSpinner();
+                        item.setId(_pays.getId());
+                        item.setLabel(_pays.getName());
+                        item.setTel(_pays.getCode());
+                        listDocTypes.add(item);
+                    }
+
+                } else {
+                    ShowSnakeBarInfo(5);
                 }
-
-
             } else {
                 ShowSnakeBarInfo(5);
             }
             customProgress1.hide();
-            wsPIApi.execute();
+
         }
 
         @Override
@@ -588,60 +665,6 @@ public class SplashScreen extends AppCompatActivity {
         }
     }
 
-    private class HttpRequestTaskIdentite extends AsyncTask<Void, Void, ResponsePieceIdentite> {
-        ResponsePieceIdentite response = null;
-
-
-        @Override
-        protected ResponsePieceIdentite doInBackground(Void... params) {
-            try {
-                final String url = getURLAPI() + "GetAllPiecesIdendite";
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                response = restTemplate.getForObject(url, ResponsePieceIdentite.class);
-                //Log.i(TAG, "Pieces Ident :" + response.toString());
-                Log.i(TAG, "Pieces Ident :" + String.valueOf(response.isStatus()));
-                Log.i(TAG, "Pieces Ident :" + String.valueOf(response.getData().size()));
-                return response;
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ResponsePieceIdentite greeting) {
-            if (response.isStatus() && (response.getData().size() != 0)) {
-                // put data into listDocTypes
-                listDocTypes = new ArrayList<>();
-                List<PieceIdentite> dataId = response.getData();
-                for (PieceIdentite _pays :
-                        dataId) {
-                    ItemSpinner item = new ItemSpinner();
-                    item.setId(_pays.getId());
-                    item.setLabel(_pays.getName());
-                    item.setTel(_pays.getCode());
-                    listDocTypes.add(item);
-                }
-            } else {
-                ShowSnakeBarInfo(5);
-            }
-            customProgress1.hide();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            customProgress1.setMessage(getResources().getText(
-                    R.string.msg_loading_resa));
-
-            customProgress1.show();
-            //Log.i(TAG, "GET Pieces Identite");
-        }
-    }
-
     private class HttpRequestTaskReservation extends AsyncTask<Void, Void, ResponseResa> {
         ResponseResa response = null;
         String ResaRef = "";
@@ -651,6 +674,7 @@ public class SplashScreen extends AppCompatActivity {
             try {
                 final String url = getURLAPI() + "GetReservation?resaRef=" + ResaRef;
                 RestTemplate restTemplate = new RestTemplate();
+                restTemplate.setErrorHandler(new MyErrorHandler());
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 response = restTemplate.getForObject(url, ResponseResa.class);
                 //Log.i(TAG, "Reservation :" + response.toString());
@@ -667,58 +691,62 @@ public class SplashScreen extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ResponseResa greeting) {
-            if (response.isStatus() && (response.getData().size() != 0)) {
-                // put data into curClients
-                curClients = new ArrayList<Client>();
-                for (Resa r :
-                        response.getData()
-                        ) {
-                    Client curClient = new Client();
+            if (response != null) {
+                if (response.isStatus() && (response.getData().size() != 0)) {
+                    // put data into curClients
+                    curClients = new ArrayList<Client>();
+                    for (Resa r :
+                            response.getData()
+                            ) {
+                        Client curClient = new Client();
 
 
-                    curClient.setCity(r.getCity());
-                    curClient.setCodePostal(r.getCodePostal());
+                        curClient.setCity(r.getCity());
+                        curClient.setCodePostal(r.getCodePostal());
 
-                    curClient.setClientId(r.getId());
-                    curClient.setCivilite(Integer.parseInt(r.getCivilite()));
-                    curClient.setClientNom(r.getNom());
-                    curClient.setClientPrenom(r.getPrenom());
-                    curClient.setPays(r.getPaysId());
-                    curClient.setAdresse(r.getAddresse());
-                    curClient.setDateNaiss(r.getDateNaissance());
-                    curClient.setEmail(r.getEmail());
-                    //Log.i("DebugZied", curClient.getDateNaiss());
-                    curClient.setLieuNaiss(r.getLieu());
-                    curClient.setSexe(r.getSexe());
-                    curClient.setSitFam(r.getSituation());
-                    curClient.setHandicape(r.getHandicape());
-                    curClient.setNatureDocIdentite(r.getPieceId());
-                    curClient.setNumDocIdentite(r.getDocNum());
-                    curClient.setGsm(r.getGsm());
-                    curClient.setProfession(r.getProfession());
-                    curClient.setCity(r.getCity());
-                    curClient.setFumeur(r.getFumeur());
-                    curClients.add(curClient);
-                }
+                        curClient.setClientId(r.getId());
+                        curClient.setCivilite(Integer.parseInt(r.getCivilite()));
+                        curClient.setClientNom(r.getNom());
+                        curClient.setClientPrenom(r.getPrenom());
+                        curClient.setPays(r.getPaysId());
+                        curClient.setAdresse(r.getAddresse());
+                        curClient.setDateNaiss(r.getDateNaissance());
+                        curClient.setEmail(r.getEmail());
+                        //Log.i("DebugZied", curClient.getDateNaiss());
+                        curClient.setLieuNaiss(r.getLieu());
+                        curClient.setSexe(r.getSexe());
+                        curClient.setSitFam(r.getSituation());
+                        curClient.setHandicape(r.getHandicape());
+                        curClient.setNatureDocIdentite(r.getPieceId());
+                        curClient.setNumDocIdentite(r.getDocNum());
+                        curClient.setGsm(r.getGsm());
+                        curClient.setProfession(r.getProfession());
+                        curClient.setCity(r.getCity());
+                        curClient.setFumeur(r.getFumeur());
+                        curClients.add(curClient);
+                    }
 
-                Intent intent = new Intent(SplashScreen.this, ClientsActivity.class);
-                intent.putExtra("NBR_CLIENTS", curClients.size());
-                intent.putExtra("RESA_REF", refResa);
-                intent.putExtra("CLIENTS", curClients);
-                intent.putExtra("PAYS", listPays);
-                intent.putExtra("DOCS", listDocTypes);
-                startActivity(intent);
+                    Intent intent = new Intent(SplashScreen.this, ClientsActivity.class);
+                    intent.putExtra("NBR_CLIENTS", curClients.size());
+                    intent.putExtra("RESA_REF", refResa);
+                    intent.putExtra("CLIENTS", curClients);
+                    intent.putExtra("PAYS", listPays);
+                    intent.putExtra("DOCS", listDocTypes);
+                    startActivity(intent);
                /*
                 for (Client cli : curClients) {
                     Log.i("Splash Activity Client", cli.toString());
                 }*/
-            } else {
-                if (!response.isStatus()) {
-                    ShowSnakeBarInfo(2);
                 } else {
-                    ShowSnakeBarInfo(0);
-                }
+                    if (!response.isStatus()) {
+                        ShowSnakeBarInfo(2);
+                    } else {
+                        ShowSnakeBarInfo(0);
+                    }
 
+                }
+            } else {
+                ShowSnakeBarInfo(0);
             }
             customProgress1.hide();
         }
@@ -739,9 +767,12 @@ public class SplashScreen extends AppCompatActivity {
         try {
             SharedPreferences sp = PreferenceManager
                     .getDefaultSharedPreferences(this);
-            URL = sp.getString("SERVEUR", "192.168.0.100");
-
-            URL = "http://" + URL + "/HNGAPI/api/apiPreCheckIn/";
+            URL = sp.getString("SERVEUR", "");
+            String urlStr = "HNGAPI";
+            boolean exist = URL.toLowerCase().matches(urlStr.toLowerCase());
+            if (!exist)
+                URL = URL + "/HNGAPI";
+            URL = "http://" + URL + "/api/apiPreCheckIn/";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -749,5 +780,30 @@ public class SplashScreen extends AppCompatActivity {
         return URL;
     }
 
+    public class MyErrorHandler implements ResponseErrorHandler {
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+            // your error handling here
+            final String code = String.valueOf(response.getRawStatusCode());
+            Log.i("ResponseErrorHandler", "handleError: " + String.valueOf(response.getRawStatusCode()));
+            runOnUiThread(new Runnable() {
 
+                @Override
+                public void run() {
+                    //ShowAlert(getResources().getString(R.string.msg_connecting_error_srv) + "\n(" + code + ")");
+                }
+            });
+        }
+
+        @Override
+        public boolean hasError(ClientHttpResponse response) throws IOException {
+            boolean hasError = false;
+            Log.i("ResponseErrorHandler", "hasError: " + String.valueOf(response.getRawStatusCode()));
+            int rawStatusCode = response.getRawStatusCode();
+            if (rawStatusCode != 200) {
+                hasError = true;
+            }
+            return hasError;
+        }
+    }
 }

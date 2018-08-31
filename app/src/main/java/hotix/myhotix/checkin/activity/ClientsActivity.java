@@ -31,11 +31,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,13 +185,12 @@ public class ClientsActivity extends AppCompatActivity {
                                         nbrClientToUpdate = clientsUpdate.size();
 
 
-                                        int i = 0;
+                                        customProgress1.setMessage(getResources().getText(
+                                                R.string.msg_saving_resa));
                                         for (Client cli : clientsUpdate) {
                                             newClient = cli;
 
 
-                                            customProgress1.setMessage(getResources().getText(
-                                                    R.string.msg_saving_resa));
                                             //customProgress1.show();
                                             if (isOnline()) {
 
@@ -199,7 +203,7 @@ public class ClientsActivity extends AppCompatActivity {
 
                                     }
                                 } else {
-                                    Intent intent = new Intent(ClientsActivity.this, CaptureSignature.class);
+                                    Intent intent = new Intent(ClientsActivity.this, SignatureActivity.class);
                                     startActivityForResult(intent, SIGNATURE_ACTIVITY);
                                 }
 
@@ -256,6 +260,12 @@ public class ClientsActivity extends AppCompatActivity {
                 break;
         }
 
+        return true;
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem registrar = menu.findItem(R.id.help);
+        registrar.setVisible(false);
         return true;
     }
 
@@ -427,13 +437,13 @@ public class ClientsActivity extends AppCompatActivity {
                         if (listFrag.size() == clientsUpdate.size()) {
                             nbrClientToUpdate = clientsUpdate.size();
 
+                            customProgress1.setMessage(getResources().getText(
+                                    R.string.msg_saving_resa));
 
-                            int i = 0;
                             for (Client cli : clientsUpdate) {
                                 newClient = cli;
-                                Log.i("Update zr", newClient.toString());
-                                customProgress1.setMessage(getResources().getText(
-                                        R.string.msg_saving_resa));
+                                // Log.i("Update zr", newClient.toString());
+
                                 //customProgress1.show();
                                 if (isOnline()) {
 
@@ -459,9 +469,12 @@ public class ClientsActivity extends AppCompatActivity {
         try {
             SharedPreferences sp = PreferenceManager
                     .getDefaultSharedPreferences(this);
-            URL = sp.getString("SERVEUR", "192.168.0.100");
-
-            URL = "http://" + URL;
+            URL = sp.getString("SERVEUR", "");
+            String urlStr = "HNGAPI";
+            boolean exist = URL.toLowerCase().matches(urlStr.toLowerCase());
+            if (!exist)
+                URL = URL + "/HNGAPI";
+            URL = "http://" + URL + "/api/apiPreCheckIn/";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -483,14 +496,14 @@ public class ClientsActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             try {
 
-                // Making a request to url and getting response
-             /*   String url = getURLAPI() + "/HNGAPI/api/apiPreCheckIn/UpdateReservationInfos";
-                url += "?clientId=" + cliToUpdate.getClientId() +
+                // Start OLD
+                String url = getURLAPI() + "UpdateReservationInfos";
+                  /*  url += "?clientId=" + cliToUpdate.getClientId() +
                         ((cliToUpdate.getClientNom() != "") ? "&NomClient=" + cliToUpdate.getClientNom() : "") +
                         ((cliToUpdate.getClientPrenom() != "") ? "&PrenomClient=" + cliToUpdate.getClientPrenom() : "") +
                         "&PaysId=" + cliToUpdate.getPays() +
                         "&clientAdresse=" + cliToUpdate.getAdresse() +
-                        "&DateNaiss=" + cliToUpdate.getDateNaiss() +
+                        "&DateNaiss=" + cliToUpdate.getDateNaiss().replace("/", "") +
                         "&LieuNaiss=" + cliToUpdate.getLieuNaiss() +
                         "&Sexe=" + cliToUpdate.getSexe() +
                         "&SitFam=" + cliToUpdate.getSitFam() +
@@ -501,34 +514,49 @@ public class ClientsActivity extends AppCompatActivity {
                         "&Email=" + cliToUpdate.getEmail() +
                         "&Gsm=" + cliToUpdate.getGsm() +
                         "&Profession=" + cliToUpdate.getProfession() +
-                        "&Image=" + cliToUpdate.getImage();*/
+                        "&Image=" + ((cliToUpdate.getImage() == null) ? "" : cliToUpdate.getImage());
                 RestTemplate restTemplate = new RestTemplate();
+                Log.i(TAG, "Update Reservation :" + url.toString());
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                URI targetUrl = UriComponentsBuilder.fromUriString(getURLAPI())
-                        .path("/HNGAPI/api/apiPreCheckIn/UpdateReservationInfos")
-                        .queryParam("clientId", cliToUpdate.getClientId())
-                        .queryParam("NomClient", cliToUpdate.getClientNom())
-                        .queryParam("PrenomClient", cliToUpdate.getClientPrenom())
-                        .queryParam("PaysId", cliToUpdate.getPays())
-                        .queryParam("clientAdresse", cliToUpdate.getAdresse())
-                        .queryParam("DateNaiss", cliToUpdate.getDateNaiss())
-                        .queryParam("LieuNaiss", cliToUpdate.getLieuNaiss())
-                        .queryParam("Sexe", cliToUpdate.getSexe())
-                        .queryParam("SitFam", cliToUpdate.getSitFam())
-                        .queryParam("Fumeur", cliToUpdate.getFumeur())
-                        .queryParam("Handicape", cliToUpdate.getHandicape())
-                        .queryParam("DocTypeId", cliToUpdate.getNatureDocIdentite())
-                        .queryParam("DocIdNum", cliToUpdate.getNumDocIdentite())
-                        .queryParam("Email", cliToUpdate.getEmail())
-                        .queryParam("Gsm", cliToUpdate.getGsm())
-                        .queryParam("Profession", cliToUpdate.getProfession())
-                        .queryParam("Image", cliToUpdate.getImage())
-                        .build()
-                        .toUri();
-                response = restTemplate.getForObject(targetUrl, Boolean.class);
+                response = restTemplate.getForObject(url, Boolean.class);
                 Log.i(TAG, "Update Reservation :" + response.toString());
 
-                return response;
+                return response;*/
+                // End
+
+                RestTemplate restTemplate = new RestTemplate();
+
+                HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+                HttpMessageConverter stringHttpMessageConverternew = new StringHttpMessageConverter();
+
+                restTemplate.getMessageConverters().add(formHttpMessageConverter);
+                restTemplate.getMessageConverters().add(stringHttpMessageConverternew);
+
+                MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+                map.add("clientId", String.valueOf(cliToUpdate.getClientId()));
+                map.add("NomClient", cliToUpdate.getClientNom());
+                map.add("PrenomClient", cliToUpdate.getClientPrenom());
+                map.add("PaysId", String.valueOf(cliToUpdate.getPays()));
+                map.add("clientAdresse", cliToUpdate.getAdresse());
+                map.add("DateNaiss", cliToUpdate.getDateNaiss().replace("/", ""));
+                map.add("LieuNaiss", cliToUpdate.getLieuNaiss());
+                map.add("Sexe", cliToUpdate.getSexe());
+                map.add("SitFam", cliToUpdate.getSitFam());
+                map.add("Fumeur", String.valueOf(cliToUpdate.getFumeur()));
+                map.add("Handicape", String.valueOf(cliToUpdate.getHandicape()));
+                map.add("DocTypeId", String.valueOf(cliToUpdate.getNatureDocIdentite()));
+                map.add("DocIdNum", cliToUpdate.getNumDocIdentite());
+                map.add("Email", cliToUpdate.getEmail());
+                map.add("Gsm", cliToUpdate.getGsm());
+                map.add("Profession", cliToUpdate.getProfession());
+                map.add("Image", ((cliToUpdate.getImage() == null) ? null : cliToUpdate.getImage()));
+
+                String responsepOST = restTemplate.postForObject(url, map, String.class);
+                Log.i(TAG, "Update Reservation :" + responsepOST);
+                response = Boolean.valueOf(responsepOST);
+                return Boolean.valueOf(response);
+
+
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
 
@@ -539,18 +567,56 @@ public class ClientsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean greeting) {
-            customProgress1.hide();
-            ShowSuccesUpdateDialog(response);
-
+            nbrClientUpdates++;
+            Log.i(TAG, "HERE 1 :" + greeting);
+            if (nbrClientToUpdate == nbrClientUpdates) {
+                customProgress1.hide();
+                Log.i(TAG, "HERE 2 :" + greeting);
+                if (response == null)
+                    response = false;
+                ShowSuccesUpdateDialog(response);
+            }
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            customProgress1.show();
-            //Log.i(TAG, "GET Reservation");
+            if (nbrClientUpdates == 0) {
+                customProgress1.show();
+                //Log.i(TAG, "GET Reservation");
+            }
         }
     }
+
+    ProgressDialog pd;
+
+    public class MyErrorHandler implements ResponseErrorHandler {
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+            // your error handling here
+            final String code = String.valueOf(response.getRawStatusCode());
+            Log.i("ResponseErrorHandler", "handleError: " + String.valueOf(response.getRawStatusCode()));
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    //ShowAlert(getResources().getString(R.string.msg_connecting_error_srv) + "\n(" + code + ")");
+                }
+            });
+        }
+
+        @Override
+        public boolean hasError(ClientHttpResponse response) throws IOException {
+            boolean hasError = false;
+            Log.i("ResponseErrorHandler", "hasError: " + String.valueOf(response.getRawStatusCode()));
+            int rawStatusCode = response.getRawStatusCode();
+            if (rawStatusCode != 200) {
+                hasError = true;
+            }
+            return hasError;
+        }
+    }
+
 
 }
 

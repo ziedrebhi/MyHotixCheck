@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,9 +17,9 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images;
 import android.util.AttributeSet;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,12 +31,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Calendar;
 
 import hotix.myhotix.checkin.R;
+import hotix.myhotix.checkin.utilities.ImageUtil;
 
 public class CaptureSignature extends Activity {
 
@@ -48,7 +49,7 @@ public class CaptureSignature extends Activity {
     private Bitmap mBitmap;
     View mView;
     File mypath;
-
+    SharedPreferences pref;
     private String uniqueId;
     private EditText yourName;
 
@@ -67,7 +68,7 @@ public class CaptureSignature extends Activity {
         current = uniqueId + ".png";
         mypath = new File(directory, current);
 
-
+        pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mContent = (LinearLayout) findViewById(R.id.linearLayout);
         mSignature = new signature(this, null);
         mSignature.setBackgroundColor(Color.WHITE);
@@ -98,12 +99,36 @@ public class CaptureSignature extends Activity {
                     Bundle b = new Bundle();
                     b.putString("status", "done");
                     b.putString("uniqueid", uniqueId);
+                    Log.v("log_tag", "uniqueid =" + uniqueId);
                     String encodedSignature = "";
+
                     if (mBitmap != null) {
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                        byte[] byteArray = byteArrayOutputStream.toByteArray();
-                        encodedSignature = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                        //encodedSignature = ImageUtil.convert(mBitmap);
+                        // encodedSignature = Base64.encodeToString(byteArray,  Base64.URL_SAFE|Base64.NO_WRAP);
+                       /*
+                        InputStream inputStream = null;//You can get an inputStream using any IO API
+                        try {
+                            inputStream = new FileInputStream(mypath);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        byte[] bytes;
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        try {
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                output.write(buffer, 0, bytesRead);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        bytes = output.toByteArray();
+                        Log.i("ZIED DEBUG", String.valueOf(bytes.length));
+                        encodedSignature = Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
+                        */
+                        encodedSignature = ImageUtil.convert(mBitmap);
                     }
                     Log.v("log_tag", "image =" + encodedSignature);
 

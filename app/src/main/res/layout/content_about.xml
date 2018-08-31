@@ -19,7 +19,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/a" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -36,7 +36,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/b" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -53,7 +53,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/c" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -69,7 +69,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/d" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -86,7 +86,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/e" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -104,7 +104,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/f" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
@@ -121,7 +121,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/g" />
+                android:src="@drawable/sultan1" />
 
             <TextView
                 style="@style/ImageTitle"
